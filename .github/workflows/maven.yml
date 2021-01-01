@@ -21,5 +21,14 @@ jobs:
       with:
         java-version: 1.11
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+    - run: mvn -B package --file pom.xml
+    - name: Start Notion Backup
     - run: java -jar ./target/notion-backup-1.0-SNAPSHOT.jar
+      env:
+        NOTION_LOCALE: en
+        NOTION_TIMEZONE: 'Europe/Berlin'
+        NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+        NOTION_EMAIL: ${{ secrets.NOTION_EMAIL }}
+        NOTION_PASSWORD: ${{ secrets.NOTION_PASSWORD }}
+        GDRIVE_ROOT_FOLDER_ID: ${{ secrets.GDRIVE_ROOT_FOLDER_ID }}
+        GDRIVE_SERVICE_ACCOUNT: ${{ secrets.GDRIVE_SERVICE_ACCOUNT }}
