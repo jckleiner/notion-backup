@@ -83,7 +83,7 @@ public class NotionBackup {
 			String taskId = notionBackup.triggerExportTask(tokenV2);
 			LOG.info("taskId extracted");
 			String downloadLink = notionBackup.getDownloadLink(taskId, tokenV2);
-			LOG.info("downloadLink: " + downloadLink);
+			LOG.info("downloadLink extracted");
 			// TODO download file
 			// TODO upload it to GDrive
 		} catch (IOException e) {
