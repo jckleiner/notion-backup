@@ -122,9 +122,10 @@ public class NotionBackup {
 				if ("success".equals(state)) {
 					return taskResultJsonNode.get("results").get(0).get("status").get("exportURL").asText();
 				}
-				sleep(3000);
+				sleep(4000);
 			}
 		}
+		// TODO
 		return "";
 	}
 
@@ -156,7 +157,7 @@ public class NotionBackup {
 
 
 	private String getTaskJson() {
-		String postBodyTemplate = "{" +
+		String taskJsonTemplate = "{" +
 				"  \"task\": {" +
 				"    \"eventName\": \"exportSpace\"," +
 				"    \"request\": {" +
@@ -169,14 +170,14 @@ public class NotionBackup {
 				"    }" +
 				"  }" +
 				"}";
-		return String.format(postBodyTemplate, notionSpaceId, exportType);
+		return String.format(taskJsonTemplate, notionSpaceId, exportType);
 	}
 
 
-	private void sleep(int duration) {
+	private void sleep(int ms) {
 		try {
-			LOG.info("sleeping...");
-			Thread.sleep(duration);
+			LOG.info("sleeping for {}ms", ms);
+			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 			LOG.error("An exception occurred: ", e);
 		}
