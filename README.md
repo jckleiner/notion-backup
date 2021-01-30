@@ -6,3 +6,10 @@ TODO:
 
 1. Find your Notion-Space-ID
 2. ...
+
+
+1. Gist - Downloader
+2. .env
+3. upload
+
+see also https://github.com/openownership/notion-backup
