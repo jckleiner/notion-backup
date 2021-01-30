@@ -260,4 +260,5 @@ build/
 
 ### Notion-backup Project
 .env
-.notion-export.zip
+notion-export.zip
+credentials.json
