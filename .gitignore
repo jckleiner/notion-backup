@@ -258,4 +258,6 @@ build/
 *.sublime-project
 *.sublime-workspace
 
+### Notion-backup Project
 .env
+.notion-export.zip

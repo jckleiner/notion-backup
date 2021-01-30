@@ -1,6 +1,8 @@
 package com.greydev.notionbackup;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +35,7 @@ public class NotionBackup {
 	private static final String LOGIN_ENDPOINT = "https://www.notion.so/api/v3/loginWithEmail";
 	private static final String DEFAULT_EXPORT_TYPE = "markdown";
 	private static final String TOKEN_V2 = "token_v2";
+	public static final String EXPORT_FILE_NAME = "notion-export.zip";
 
 	private final CookieStore httpCookieStore = new BasicCookieStore();
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -54,6 +57,7 @@ public class NotionBackup {
 		notionEmail = dotenv.get("NOTION_EMAIL");
 		notionPassword = dotenv.get("NOTION_PASSWORD");
 		exportType = StringUtils.isNotBlank(dotenv.get("EXPORT_TYPE")) ? dotenv.get("EXPORT_TYPE") : DEFAULT_EXPORT_TYPE;
+		LOG.info("Using export type: {}", exportType);
 
 		if (StringUtils.isBlank(notionSpaceId)) {
 			exit("notionSpaceId is missing!");
@@ -80,12 +84,20 @@ public class NotionBackup {
 		try {
 			String tokenV2 = notionBackup.getTokenV2();
 			LOG.info("tokenV2 extracted");
+
 			String taskId = notionBackup.triggerExportTask(tokenV2);
 			LOG.info("taskId extracted");
+
 			String downloadLink = notionBackup.getDownloadLink(taskId, tokenV2);
 			LOG.info("downloadLink extracted");
-			// TODO download file
+
+			Downloader downloader = new Downloader();
+			System.out.println("Downloading file...");
+			downloader.download(new URL(downloadLink), new File(EXPORT_FILE_NAME)); // This will override the already existing export file
+
+			System.out.println("Download finished. Uploading the file to GDrive...");
 			// TODO upload it to GDrive
+			System.out.println("Finished uploading the file to GDrive.");
 		} catch (IOException e) {
 			LOG.error("An exception occurred: ", e);
 		}
