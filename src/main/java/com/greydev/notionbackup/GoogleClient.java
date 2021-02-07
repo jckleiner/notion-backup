@@ -37,6 +37,7 @@ public class GoogleClient {
 	// TODO inject
 	GoogleClient(Dotenv dotenv) {
 		gdriveRootFolderId = dotenv.get(KEY_GDRIVE_ROOT_FOLDER_ID);
+		// TODO add check
 		driveService = initGDriveService(extractServiceAccountSecret(dotenv));
 	}
 
