@@ -113,11 +113,10 @@ public class NotionClient {
 
 
 	private File downloadToFile(String url, File destinationFile) throws IOException {
-		OkHttpClient client = new OkHttpClient();
 		Request request = new Request.Builder()
 				.url(url)
 				.build();
-		try (Response response = client.newCall(request).execute()) {
+		try (Response response = okHttpClient.newCall(request).execute()) {
 			InputStream in = response.body().byteStream();
 			FileUtils.copyInputStreamToFile(in, destinationFile);
 			return destinationFile;
@@ -176,7 +175,7 @@ public class NotionClient {
 				.post(RequestBody.create(getTaskJson(), MEDIA_TYPE_JSON))
 				.build();
 
-		try (Response response = new OkHttpClient().newCall(request).execute()) {
+		try (Response response = okHttpClient.newCall(request).execute()) {
 			JsonNode responseJsonNode = objectMapper.readTree(response.body().string());
 			return responseJsonNode.get("taskId").asText();
 		}
