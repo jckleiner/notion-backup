@@ -1,6 +1,5 @@
 # notion-backup
 
-
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-workflow/badge.svg?branch=master)
 
 ### Warning: this repo is far from done, it's still work-in-progress!
@@ -87,6 +86,33 @@ TODO: GIF
 
 TODO: If/when the no-expiration-date tokens are removed then update the authentication method.
 
+## Setup
+
+### 3 ways
+
+* Fork
+* Docker?
+* Locally?
+
+### Fork
+
+1. Create repository secrets for the following variables:
+
+        # Required
+        NOTION_SPACE_ID=1234-56789-abcdef
+        NOTION_EMAIL=notion@example.com
+        NOTION_PASSWORD=password
+   
+        # Optional
+        GDRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-gdrive>
+        GDRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
+        GDRIVE_SERVICE_ACCOUNT_SECRET_JSON=
+        GDRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
+        
+        DROPBOX_ACCESS_TOKEN=<generate-token-from-dropbox-developer-console>
+
+2. Fork this repository. That's it!
+
 ## Running it locally
 
 ### Set Credentials
@@ -103,6 +129,8 @@ Create a `.env` file in the root directory of the project with the following pro
     DROPBOX_ACCESS_TOKEN=<generate-token-from-dropbox-developer-console>
 
 ### 4. Start the Export
+
+Docker?
 
 Run the application with ``
 

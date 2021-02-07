@@ -19,14 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DropboxClient {
 
-	private static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
+	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
 
 	private final String dropboxAccessToken;
 	private DbxClientV2 dropboxClient;
 
 
-	DropboxClient(Dotenv env) {
-		dropboxAccessToken = env.get(KEY_DROPBOX_ACCESS_TOKEN);
+	DropboxClient(Dotenv dotenv) {
+		dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
 
 		// TODO how to handle it better if env vars not provided?
 		if (StringUtils.isBlank(dropboxAccessToken)) {

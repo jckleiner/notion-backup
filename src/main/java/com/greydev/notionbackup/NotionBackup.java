@@ -34,9 +34,11 @@ public class NotionBackup {
 		dropboxClient.upload(exportedFile);
 
 		// TODO if export limit exceeded, print response
+		// TODO publish github package with actions when new merge in master
 		// TODO GitClient
 		// TODO NexcloudClient
 		// TODO With cron to local folder
+		// TODO Docker
 		// TODO give file name as param?
 		// TODO add tests, mockito
 		// TODO testing with okhttp's mock server?
