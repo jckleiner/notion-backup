@@ -2,11 +2,13 @@
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-workflow/badge.svg?branch=master)
 
+### Warning: this repo is far from done, it's still work-in-progress!
+
 TODO:
 
 0. Create gifs for readme, update readme, document also how github actions work in this project
-1. Gist: GoogleCredentials-Service Account, apache http client
-2. upload file to GDrive/Nextcloud/Dropbox
+1. Gist: GoogleCredentials-Service Account, apache http client, okhttp
+2. upload file to Nextcloud
 3. create Dockerfile so ci-cd will pull it from dockerhub
 
 ### 1. Find Your notion-space-id
@@ -82,9 +84,9 @@ TODO: GIF
 
 > Long-lived tokens are less secure and will be deprecated in the future.
 
-TODO: If/when the no-expiration-date tokens are removed then update the authentication method. 
+TODO: If/when the no-expiration-date tokens are removed then update the authentication method.
 
-## Running it locally 
+## Running it locally
 
 ### Set Credentials
 
@@ -95,6 +97,9 @@ Create a `.env` file in the root directory of the project with the following pro
     NOTION_PASSWORD=password
     GDRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-gdrive>
     GDRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
+    GDRIVE_SERVICE_ACCOUNT_SECRET_JSON=
+    GDRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
+    DROPBOX_ACCESS_TOKEN=<generate-token-from-dropbox-developer-console>
 
 ### 4. Start the Export
 
