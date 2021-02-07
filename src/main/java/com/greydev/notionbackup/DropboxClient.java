@@ -22,7 +22,7 @@ public class DropboxClient {
 	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
 
 	private final String dropboxAccessToken;
-	private DbxClientV2 dropboxClient;
+	private DbxClientV2 dbxClient;
 
 
 	DropboxClient(Dotenv dotenv) {
@@ -33,7 +33,7 @@ public class DropboxClient {
 			log.info("Cannot instantiate instance because {} is empty", KEY_DROPBOX_ACCESS_TOKEN);
 		} else {
 			DbxRequestConfig config = DbxRequestConfig.newBuilder("dropbox/notion-backup").build();
-			dropboxClient = new DbxClientV2(config, dropboxAccessToken);
+			dbxClient = new DbxClientV2(config, dropboxAccessToken);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class DropboxClient {
 		log.info("Uploading file '{}' to Dropbox...", fileToUpload.getName());
 		try (InputStream in = new FileInputStream(fileToUpload)) {
 			// without slash: IllegalArgumentException: String 'path' does not match pattern
-			dropboxClient.files().uploadBuilder("/" + fileToUpload.getName()).uploadAndFinish(in);
+			dbxClient.files().uploadBuilder("/" + fileToUpload.getName()).uploadAndFinish(in);
 
 			if (doesFileExist(fileToUpload.getName())) {
 				log.info("Successfully uploaded '{}' to Dropbox", fileToUpload.getName());
@@ -61,8 +61,8 @@ public class DropboxClient {
 	}
 
 
-	private boolean doesFileExist(String fileName) throws DbxException {
-		ListFolderResult result = dropboxClient.files().listFolder("");
+	public boolean doesFileExist(String fileName) throws DbxException {
+		ListFolderResult result = dbxClient.files().listFolder("");
 		return result.getEntries().stream()
 				.anyMatch(entry -> StringUtils.equalsIgnoreCase(entry.getName(), fileName));
 	}
