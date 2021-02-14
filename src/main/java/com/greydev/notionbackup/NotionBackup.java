@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -12,12 +13,18 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.v2.DbxClientV2;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
 public class NotionBackup {
+
+	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
+
 
 	public static void main(String[] args) throws IOException, GeneralSecurityException {
 		Dotenv dotenv = initDotenv();
@@ -30,7 +37,16 @@ public class NotionBackup {
 
 		GoogleClient googleClient = new GoogleClient(dotenv);
 		googleClient.upload(exportedFile);
-		DropboxClient dropboxClient = new DropboxClient(dotenv);
+
+
+		// TODO
+		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
+		if (StringUtils.isBlank(dropboxAccessToken)) {
+			throw new IllegalArgumentException("The given accessToken is blank!");
+		}
+		DbxRequestConfig config = DbxRequestConfig.newBuilder("dropbox/notion-backup").build();
+		DbxClientV2 dbxClient = new DbxClientV2(config, dropboxAccessToken);
+		DropboxClient dropboxClient = new DropboxClient(dbxClient);
 		dropboxClient.upload(exportedFile);
 
 		// TODO if export limit exceeded, print response
@@ -57,8 +73,7 @@ public class NotionBackup {
 				.ignoreIfMalformed()
 				.load();
 		if (dotenv == null) {
-			log.error("Could not load dotenv!");
-			System.exit(1);
+			throw new IllegalStateException("Could not load dotenv!");
 		}
 		return dotenv;
 	}
