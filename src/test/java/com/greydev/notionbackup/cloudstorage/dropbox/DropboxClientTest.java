@@ -52,6 +52,7 @@ public class DropboxClientTest {
 		boolean result = testee.upload(testFileToUpload);
 
 		// then
+		// TODO verify each method call in call chain?
 		verify(dropboxService.files().uploadBuilder("/testFileToUpload.txt")).uploadAndFinish(any(FileInputStream.class));
 		verify(testee).doesFileExist("testFileToUpload.txt");
 		assertTrue(result);

@@ -6,12 +6,13 @@ import java.util.Collections;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.greydev.notionbackup.cloudstorage.CloudStorageClient;
 
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class GoogleDriveClient {
+public class GoogleDriveClient implements CloudStorageClient {
 
 	private final Drive driveService;
 	private final String googleDriveRootFolderId;
@@ -24,7 +25,7 @@ public class GoogleDriveClient {
 	}
 
 
-	public void upload(java.io.File fileToUpload) {
+	public boolean upload(java.io.File fileToUpload) {
 
 		/* TODO how people normally you would process XML:
 			TODO Create examples for every one of them
@@ -47,23 +48,30 @@ public class GoogleDriveClient {
 		log.info("Google Drive: uploading file '{}' ...", fileToUpload.getName());
 		if (!(fileToUpload.exists() && fileToUpload.isFile())) {
 			log.error("Google Drive: could not find {} in project root directory", fileToUpload.getName());
-			return;
+			return false;
 		}
 
-		//		FileContent notionExportFile = new FileContent("application/zip", filePath);
-		FileContent notionExportFile = new FileContent("application/zip", fileToUpload);
+		FileContent notionExportFileContent = new FileContent("application/zip", fileToUpload);
 		File fileMetadata = new File();
 		fileMetadata.setName(fileToUpload.getName());
 		fileMetadata.setParents(Collections.singletonList(googleDriveRootFolderId));
 		try {
-			File file = driveService.files().create(fileMetadata, notionExportFile)
+			File file = driveService.files().create(fileMetadata, notionExportFileContent)
 					.setFields("id, parents")
 					.execute();
+			// TODO check if exists?
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.warn("Google Drive: IOException ", e);
+			return false;
 		}
 		log.info("Google Drive: Successfully uploaded '{}'", fileToUpload.getName());
+		return true;
+	}
 
+
+	@Override
+	public boolean doesFileExist(String fileName) {
+		return false;
 	}
 
 	//	private String upload() throws FileNotFoundException {
