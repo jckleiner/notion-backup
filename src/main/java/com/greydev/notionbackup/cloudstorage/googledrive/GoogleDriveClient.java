@@ -1,4 +1,4 @@
-package com.greydev.notionbackup;
+package com.greydev.notionbackup.cloudstorage.googledrive;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,7 +18,7 @@ public class GoogleDriveClient {
 
 
 	// TODO inject
-	GoogleDriveClient(Drive driveService, String googleDriveRootFolderId) {
+	public GoogleDriveClient(Drive driveService, String googleDriveRootFolderId) {
 		this.driveService = driveService;
 		this.googleDriveRootFolderId = googleDriveRootFolderId;
 	}

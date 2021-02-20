@@ -1,4 +1,4 @@
-package com.greydev.notionbackup;
+package com.greydev.notionbackup.cloudstorage.dropbox;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.ListFolderResult;
+import com.greydev.notionbackup.cloudstorage.CloudStorageClient;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +27,7 @@ public class DropboxClient implements CloudStorageClient {
 	private final DbxClientV2 dropboxService;
 
 
-	DropboxClient(DbxClientV2 dropboxService) {
+	public DropboxClient(DbxClientV2 dropboxService) {
 		this.dropboxService = dropboxService;
 	}
 

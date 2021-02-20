@@ -16,6 +16,10 @@ import org.apache.http.impl.client.HttpClients;
 
 import com.dropbox.core.v2.DbxClientV2;
 import com.google.api.services.drive.Drive;
+import com.greydev.notionbackup.cloudstorage.dropbox.DropboxClient;
+import com.greydev.notionbackup.cloudstorage.dropbox.DropboxServiceFactory;
+import com.greydev.notionbackup.cloudstorage.googledrive.GoogleDriveClient;
+import com.greydev.notionbackup.cloudstorage.googledrive.GoogleDriveServiceFactory;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
@@ -111,7 +115,7 @@ public class NotionBackup {
 		if (StringUtils.isNotBlank(serviceAccountSecret)) {
 			return Optional.of(serviceAccountSecret);
 		}
-		// If not then read the value from the given secret file path
+		// If not then read the value from the given path to the file which contains the secret
 		if (StringUtils.isNotBlank(serviceAccountSecretFilePath)) {
 			return readFileContentAsString(serviceAccountSecretFilePath);
 		}
