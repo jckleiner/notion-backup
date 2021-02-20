@@ -28,20 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NotionBackup {
 
-	// TODO DI
 	// TODO if export limit exceeded, print response
-	// TODO publish github package with actions when new merge in master
-	// TODO GitClient
-	// TODO NexcloudClient
-	// TODO With cron to local folder
-	// TODO Docker
-	// TODO give file name as param?
 	// TODO add tests, mockito
 	// TODO testing with okhttp's mock server?
 	// TODO test where the download will go if the path is "exportFolder/", will the jar create it in the pwd?
 	// TODO make a common interface, make a list, loop and call upload on each, make upload async
-	// TODO best way to run async code in java?
-	// TODO // method call or code to be async.
 	// TODO where and how to handle errors
 	// 	if no key is given, we don't want to stop the whole app, just ignore the upload call with logs
 
@@ -73,17 +64,17 @@ public class NotionBackup {
 	public static void startGoogleDriveBackup(File fileToUpload) {
 		Optional<String> serviceAccountSecretOptional = extractGoogleServiceAccountSecret();
 		if (serviceAccountSecretOptional.isEmpty()) {
-			log.info("No secret provided for GoogleDrive. Skipping GoogleDrive.");
+			log.info("No secret provided for Google Drive. Skipping Google Drive upload.");
 			return;
 		}
 		Optional<Drive> googleServiceOptional = GoogleDriveServiceFactory.create(serviceAccountSecretOptional.get());
 		if (googleServiceOptional.isEmpty()) {
-			log.warn("Could not create GoogleDrive service. Skipping GoogleDrive.");
+			log.warn("Could not create Google Drive service. Skipping Google Drive upload.");
 			return;
 		}
 		String googleDriveRootFolderId = dotenv.get(KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID);
 		if (StringUtils.isBlank(googleDriveRootFolderId)) {
-			log.info("{} is blank, skipping GoogleDrive...", KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID);
+			log.info("{} is blank. Skipping Google Drive upload.", KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID);
 			return;
 		}
 		GoogleDriveClient GoogleDriveClient = new GoogleDriveClient(googleServiceOptional.get(), googleDriveRootFolderId);
@@ -94,12 +85,12 @@ public class NotionBackup {
 	public static void startDropboxBackup(File fileToUpload) {
 		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
 		if (StringUtils.isBlank(dropboxAccessToken)) {
-			log.info("{} is blank, skipping Dropbox...", KEY_DROPBOX_ACCESS_TOKEN);
+			log.info("{} is blank. Skipping Dropbox upload.", KEY_DROPBOX_ACCESS_TOKEN);
 			return;
 		}
 		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken);
 		if (dropboxServiceOptional.isEmpty()) {
-			log.warn("Dropbox service is empty. Skipping...");
+			log.warn("Could not create Dropbox service. Skipping Dropbox upload");
 			return;
 		}
 		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());

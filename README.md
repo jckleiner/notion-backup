@@ -10,6 +10,11 @@ TODO:
 1. Gist: GoogleCredentials-Service Account, apache http client, okhttp
 2. upload file to Nextcloud
 3. create Dockerfile so ci-cd will pull it from dockerhub
+4. GitClient
+5. NextcloudClient
+6. With cron to local folder
+7. Docker
+8. publish github package with actions when new merge in master, increase version with every merge to master
 
 ### 1. Find Your notion-space-id
 
