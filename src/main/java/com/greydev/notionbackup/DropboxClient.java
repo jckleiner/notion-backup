@@ -15,21 +15,19 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class DropboxClient {
+public class DropboxClient implements CloudStorageClient {
 
 	/*
 	When you want to be able to define the value of a private field, you have two options:
 		1. The first one is to create a constructor that receives the value to be set and
 		2. The second one is to create a setter for such private field.
+		3. (BAD) Set field with reflection
  	*/
-	private DbxClientV2 dbxClient;
-
-	// TODO naming dbxClient
-	// TODO how to test constructor?
+	private final DbxClientV2 dropboxService;
 
 
-	DropboxClient(DbxClientV2 dbxClient) {
-		this.dbxClient = dbxClient;
+	DropboxClient(DbxClientV2 dropboxService) {
+		this.dropboxService = dropboxService;
 	}
 
 
@@ -39,30 +37,34 @@ public class DropboxClient {
 	 * @param fileToUpload file to upload
 	 * @return true if the upload was successful, false otherwise.
 	 */
+	// You should always annotate methods with @Override if it's available, also interface methods
+	@Override
 	public boolean upload(File fileToUpload) {
-		log.info("Uploading file '{}' to Dropbox...", fileToUpload.getName());
+		log.info("Dropbox: uploading file '{}' ...", fileToUpload.getName());
 		try (InputStream in = new FileInputStream(fileToUpload)) {
 			// This method not override if it's the same file with the same name and silently executes
 			// Throws an UploadErrorException if we try to upload a different file with an already existing name
 			// without slash: IllegalArgumentException: String 'path' does not match pattern
-			dbxClient.files().uploadBuilder("/" + fileToUpload.getName()).uploadAndFinish(in);
+			dropboxService.files().uploadBuilder("/" + fileToUpload.getName()).uploadAndFinish(in);
 
 			if (doesFileExist(fileToUpload.getName())) {
-				log.info("Successfully uploaded '{}' to Dropbox", fileToUpload.getName());
+				log.info("Dropbox: successfully uploaded '{}'", fileToUpload.getName());
 				return true;
 			} else {
-				log.warn("Could not upload '{}' to Dropbox", fileToUpload.getName());
+				log.warn("Dropbox: could not upload '{}'", fileToUpload.getName());
 			}
 		} catch (IOException | DbxException e) {
-			log.warn("Exception during upload of file '{}'", fileToUpload.getName(), e);
+			log.warn("Dropbox: exception during upload of file '{}'", fileToUpload.getName(), e);
 		}
 		return false;
 	}
 
 
+	@Override // You should always annotate methods with @Override if it's available, also interface methods
 	public boolean doesFileExist(String fileName) throws DbxException {
-		ListFolderResult result = dbxClient.files().listFolder("");
+		ListFolderResult result = dropboxService.files().listFolder("");
 		return result.getEntries().stream()
 				.anyMatch(entry -> StringUtils.equalsIgnoreCase(entry.getName(), fileName));
 	}
+
 }

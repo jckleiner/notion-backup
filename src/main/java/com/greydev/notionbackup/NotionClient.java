@@ -11,8 +11,6 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.CookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,18 +40,14 @@ public class NotionClient {
 	private final String notionEmail;
 	private final String notionPassword;
 	private final String exportType;
-	private final CookieStore cookieStore;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	private final CloseableHttpClient httpClient;
 	private final OkHttpClient okHttpClient;
 	private final CookieJar cookieJar;
 	private static final MediaType MEDIA_TYPE_JSON = MediaType.get("application/json; charset=utf-8");
 
 
-	NotionClient(Dotenv dotenv, CloseableHttpClient httpClient, CookieStore cookieStore) {
-		this.httpClient = httpClient;
-		this.cookieStore = cookieStore;
+	NotionClient(Dotenv dotenv) {
 
 		CookieManager cookieManager = new CookieManager();
 		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);

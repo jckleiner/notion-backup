@@ -36,7 +36,7 @@ First, we need to obtain our oauth credentials, here's how to do it:
 - Click on your newly created account in the displayed list.
 - Keys -> Add Key -> Create new key -> JSON
 - Download the secret file, rename it to `credentials.json` and move it to the project root directory.
-- Login to your GDrive account and select the folder you want to share with your service account ***TODO***
+- Login to your Google Drive account and select the folder you want to share with your service account ***TODO***
 
 Now, we have obtained our credentials, move to the [First run](#first-run) section to use those credentials:
 
@@ -69,9 +69,9 @@ can see the shared folder from your Drive account.
 
 TODO: If
 
-a) GDRIVE_SERVICE_ACCOUNT_SECRET_VALUE: paste value here (as a secret in github for example)
+a) GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_VALUE: paste value here (as a secret in github for example)
 
-b) GDRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH: File path for the secret file
+b) GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH: File path for the secret file
 
 ### Dropbox
 
@@ -102,12 +102,12 @@ TODO: If/when the no-expiration-date tokens are removed then update the authenti
         NOTION_SPACE_ID=1234-56789-abcdef
         NOTION_EMAIL=notion@example.com
         NOTION_PASSWORD=password
-   
+
         # Optional
-        GDRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-gdrive>
-        GDRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
-        GDRIVE_SERVICE_ACCOUNT_SECRET_JSON=
-        GDRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
+        GOOGLE_DRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-google-drive>
+        GOOGLE_DRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
+        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=
+        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
         
         DROPBOX_ACCESS_TOKEN=<generate-token-from-dropbox-developer-console>
 
@@ -122,10 +122,10 @@ Create a `.env` file in the root directory of the project with the following pro
     NOTION_SPACE_ID=1234-56789-abcdef
     NOTION_EMAIL=notion@example.com
     NOTION_PASSWORD=password
-    GDRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-gdrive>
-    GDRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
-    GDRIVE_SERVICE_ACCOUNT_SECRET_JSON=
-    GDRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
+    GOOGLE_DRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-google-drive>
+    GOOGLE_DRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
+    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=
+    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
     DROPBOX_ACCESS_TOKEN=<generate-token-from-dropbox-developer-console>
 
 ### 4. Start the Export
