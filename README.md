@@ -4,79 +4,47 @@
 
 ### Warning: this repo is far from done, it's still work-in-progress!
 
-TODO:
+### Find Your notion-space-id
 
-0. Create gifs for readme, update readme, document also how github actions work in this project
-1. Gist: GoogleCredentials-Service Account, apache http client, okhttp
-2. upload file to Nextcloud
-3. create Dockerfile so ci-cd will pull it from dockerhub
-4. GitClient
-5. NextcloudClient
-6. With cron to local folder
-7. Docker
-8. publish github package with actions when new merge in master, increase version with every merge to master
+You need to find ... TODO
 
-### 1. Find Your notion-space-id
-
-1. [Login](https://www.notion.so/login) to your notion profile
-2. Open the network tab in your developer console
-3. Click on "Quick Find" on the Notion menu (should be at the upper left corner) and type something
-4. Typing will trigger a new request to `search`. Open that request and copy the value of `spaceId`
+1. Login to your [notion profile](https://www.notion.so/login)
+2. Open your developer console of your browser and go to the "Network" tab
+3. Click on "Quick Find" on the Notion menu (should be at the upper left corner) and type something in the search bar
+4. Typing will trigger a new request with the name `search` which should be visible under the network tab. Open that
+   request and copy the value of `spaceId`
 
 ![testImage](images/notion-search-request.png)
 
-### 2. Google...
 
-## Usage
+## Backup Options
 
-First, we need to obtain our oauth credentials, here's how to do it:
+### Google Drive
 
-### Generating Oauth Credentials
-
-- Follow [Enable Drive API](#enable-drive-api) section.
-- Open [google console](https://console.developers.google.com/).
-- Click on "Credentials".
-- Click "Create credentials" and select "Service Account".
-- Give it a name and click "DONE" (You can ignore the other steps)
-- Click on your newly created account in the displayed list.
-- Keys -> Add Key -> Create new key -> JSON
-- Download the secret file, rename it to `credentials.json` and move it to the project root directory.
-- Login to your Google Drive account and select the folder you want to share with your service account ***TODO***
+1. Login to your [google developer console](https://console.developers.google.com/)
+2. Open [cloud-resource-manager](https://console.cloud.google.com/cloud-resource-manager) and create a project.
+3. Go to the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) page
+4. Make sure in the top left corner you've selected your newly created project
+5. Click "Enable" (if Google Driver API is already enabled for your project, you will see a "Manage" button. In that
+   case you can continue with the next step)
+6. Open the [credentials page](https://console.cloud.google.com/apis/credentials)
+7. Click "Create credentials" and select "Service Account"
+8. Give it a name and click "DONE" (You can ignore the other steps)
+9. You will see your newly created service account E-Mail address under the "Service Accounts" section. Click on that account.
+10. Copy the E-Mail address of your service account since you will need it later.
+11. Keys -> Add Key -> Create new key -> JSON and download that file
+12. Rename the downloaded file to `credentials.json` and move it to the project root directory.
+13. Login to your [Google Drive account](https://drive.google.com/drive/) and select the folder you want your notion 
+    backups to be saved in. You need to share that folder with the service account you've just created. Right click on 
+    the folder -> Share -> enter the E-Mail address of your service account. (Your service account's address probably 
+    looks like XXX@XXX.iam.gserviceaccount.com)
+14. TODO - Copy the id of that folder, from the URL
+15. You are now ready to setup the application. Go to TODO - link to setup...
 
 Now, we have obtained our credentials, move to the [First run](#first-run) section to use those credentials:
 
-### Enable Drive API
-
-- Log into google developer console at [google console](https://console.developers.google.com/).
-- Click select project at the right side of "Google Cloud Platform" of upper left of window.
-
-If you cannot see the project, please try to access
-to [https://console.cloud.google.com/cloud-resource-manager](https://console.cloud.google.com/cloud-resource-manager).
-
-You can also create new project at there. When you create a new project there, please click the left of "Google Cloud Platform". You can see it like 3
-horizontal lines.
-
-By this, a side bar is opened. At there, select "API & Services" -> "Library". After this, follow the below steps:
-
-- Click "NEW PROJECT" and input the "Project Name".
-- Click "CREATE" and open the created project.
-- Click "Enable APIs and get credentials like keys".
-- Go to "Library"
-- Input "Drive API" in "Search for APIs & Services".
-- Click "Google Drive API" and click "ENABLE".
 
 [Go back to oauth credentials setup](#generating-oauth-credentials)
-
-#### Create a Service Account
-
-Share your Drive account's folder to your service account. Your service account's addresss looks like XXX@XXX.iam.gserviceaccount.com. Then your service account
-can see the shared folder from your Drive account.
-
-TODO: If
-
-a) GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_VALUE: paste value here (as a secret in github for example)
-
-b) GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH: File path for the secret file
 
 ### Dropbox
 
@@ -90,6 +58,9 @@ TODO: GIF
 > Long-lived tokens are less secure and will be deprecated in the future.
 
 TODO: If/when the no-expiration-date tokens are removed then update the authentication method.
+
+### Folder on your local machine
+TODO
 
 ## Setup
 
@@ -140,3 +111,14 @@ Docker?
 Run the application with ``
 
 see also https://github.com/openownership/notion-backup
+
+TODO:
+
+0. Create gifs for readme, update readme, document also how github actions work in this project
+1. Gist: GoogleCredentials-Service Account, apache http client, okhttp
+2. upload file to Nextcloud
+3. create Dockerfile so ci-cd will pull it from dockerhub
+4. GitClient
+5. NextcloudClient
+6. With cron to local folder
+7. Docker
