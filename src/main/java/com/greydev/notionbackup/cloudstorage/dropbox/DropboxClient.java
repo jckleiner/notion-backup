@@ -43,7 +43,7 @@ public class DropboxClient implements CloudStorageClient {
 	public boolean upload(File fileToUpload) {
 		log.info("Dropbox: uploading file '{}' ...", fileToUpload.getName());
 		try (InputStream in = new FileInputStream(fileToUpload)) {
-			// This method not override if it's the same file with the same name and silently executes
+			// This method does not override if it's the same file with the same name and silently executes
 			// Throws an UploadErrorException if we try to upload a different file with an already existing name
 			// without slash: IllegalArgumentException: String 'path' does not match pattern
 			dropboxService.files().uploadBuilder("/" + fileToUpload.getName()).uploadAndFinish(in);

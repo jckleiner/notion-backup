@@ -17,33 +17,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- APACHE HTTP -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.5.13</version>
-		</dependency>
-		<!--/ APACHE HTTP -->
-
-		<!-- OKHTTP -->
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.9.1</version>
-		</dependency>
-
-		<!-- OKHTTP URL CONNECTION, needed for the CookieJar -->
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp-urlconnection</artifactId>
-			<version>4.9.1</version>
-		</dependency>
 
 		<!-- GOOGLE -->
 		<dependency>
@@ -99,6 +72,13 @@
 			<version>3.11</version>
 		</dependency>
 
+		<!-- APACHE COMMONS-IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+
 		<!-- SLF4J -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -113,12 +93,6 @@
 			<version>1.2.3</version>
 		</dependency>
 
-		<!-- APACHE COMMONS-IO -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.8.0</version>
-		</dependency>
 
 		<!-- DROPBOX API-->
 		<dependency>

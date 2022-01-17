@@ -2,6 +2,11 @@ package com.greydev.notionbackup;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -54,12 +59,12 @@ public class NotionBackup {
 				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
 
 		// use a local file to skip the notion export step
-		// final File exportedFile = new File("notion-export-markdown_2021-02-06_23-37.zip");
+		// final File exportedFile = new File("notion-export-markdown_2022-01-17_22-39.zip");
 
-		CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
-		CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
-
-		CompletableFuture.allOf(futureGoogleDrive, futureDropbox).join();
+		// CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
+		// CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
+		// futureDropbox.join();
+		// CompletableFuture.allOf(futureGoogleDrive, futureDropbox).join();
 	}
 
 
@@ -86,6 +91,7 @@ public class NotionBackup {
 
 	public static void startDropboxBackup(File fileToUpload) {
 		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
+
 		if (StringUtils.isBlank(dropboxAccessToken)) {
 			log.info("{} is blank. Skipping Dropbox upload.", KEY_DROPBOX_ACCESS_TOKEN);
 			return;

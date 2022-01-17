@@ -16,7 +16,6 @@ You need to find ... TODO
 
 ![testImage](images/notion-search-request.png)
 
-
 ## Backup Options
 
 ### Google Drive
@@ -30,19 +29,19 @@ You need to find ... TODO
 6. Open the [credentials page](https://console.cloud.google.com/apis/credentials)
 7. Click "Create credentials" and select "Service Account"
 8. Give it a name and click "DONE" (You can ignore the other steps)
-9. You will see your newly created service account E-Mail address under the "Service Accounts" section. Click on that account.
+9. You will see your newly created service account E-Mail address under the "Service Accounts" section. Click on that
+   account.
 10. Copy the E-Mail address of your service account since you will need it later.
 11. Keys -> Add Key -> Create new key -> JSON and download that file
 12. Rename the downloaded file to `credentials.json` and move it to the project root directory.
-13. Login to your [Google Drive account](https://drive.google.com/drive/) and select the folder you want your notion 
-    backups to be saved in. You need to share that folder with the service account you've just created. Right click on 
-    the folder -> Share -> enter the E-Mail address of your service account. (Your service account's address probably 
+13. Login to your [Google Drive account](https://drive.google.com/drive/) and select the folder you want your notion
+    backups to be saved in. You need to share that folder with the service account you've just created. Right click on
+    the folder -> Share -> enter the E-Mail address of your service account. (Your service account's address probably
     looks like XXX@XXX.iam.gserviceaccount.com)
 14. TODO - Copy the id of that folder, from the URL
 15. You are now ready to setup the application. Go to TODO - link to setup...
 
 Now, we have obtained our credentials, move to the [First run](#first-run) section to use those credentials:
-
 
 [Go back to oauth credentials setup](#generating-oauth-credentials)
 
@@ -50,16 +49,21 @@ Now, we have obtained our credentials, move to the [First run](#first-run) secti
 
 TODO: GIF
 
-1. Create app on developer console
+1. Create app on developer console (https://www.dropbox.com/developers/apps/create)
 2. (Important to change the permissions first before generating a token)
-   Go to permissions tab -> enable `files.content.write` & `files.content.read`
-2. Generate token / copy secret as json file
+   Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your changes
+3. Go to "Settings > OAuth 2 > Generate access token > generate > Access token expiration: "no expiration and copy the
+   token
 
 > Long-lived tokens are less secure and will be deprecated in the future.
+
+If you got an Exception like this: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try
+to re-generate your access token and run the application again.
 
 TODO: If/when the no-expiration-date tokens are removed then update the authentication method.
 
 ### Folder on your local machine
+
 TODO
 
 ## Setup

@@ -3,17 +3,28 @@ package com.greydev.notionbackup;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.protocol.HTTP;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.api.client.http.HttpStatusCodes;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
@@ -41,18 +52,15 @@ public class NotionClient {
 	private final String notionPassword;
 	private final String exportType;
 
+	private final HttpClient newClient;
+	private final CookieManager cookieManager;
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	private final OkHttpClient okHttpClient;
-	private final CookieJar cookieJar;
-	private static final MediaType MEDIA_TYPE_JSON = MediaType.get("application/json; charset=utf-8");
 
 
 	NotionClient(Dotenv dotenv) {
-
-		CookieManager cookieManager = new CookieManager();
-		cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-		this.cookieJar = new JavaNetCookieJar(cookieManager);
-		this.okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build();
+		this.cookieManager = new CookieManager();
+		CookieHandler.setDefault(this.cookieManager);
+		this.newClient = HttpClient.newBuilder().cookieHandler(this.cookieManager).build();
 
 		// both environment variables and variables defined in the .env file can be accessed this way
 		notionSpaceId = dotenv.get(KEY_NOTION_SPACE_ID);
@@ -81,14 +89,24 @@ public class NotionClient {
 	public Optional<File> export() {
 		File downloadedFile = null;
 		try {
-			String tokenV2 = getTokenV2();
-			log.info("tokenV2 extracted");
+			Optional<String> tokenV2 = getTokenV2();
+			if (tokenV2.isEmpty()) {
+				log.info("tokenV2 could not be extracted");
+				return Optional.empty();
+			}
+			// TODO delete token log
+			log.info("tokenV2 extracted: " + tokenV2);
 
-			String taskId = triggerExportTask(tokenV2);
-			log.info("taskId extracted");
+			String taskId = triggerExportTask(tokenV2.get());
+			// TODO delete token log
+			log.info("taskId extracted: " + taskId);
 
-			String downloadLink = getDownloadLink(taskId, tokenV2);
-			log.info("downloadLink extracted");
+			Optional<String> downloadLink = getDownloadLink(taskId, tokenV2.get());
+			if (downloadLink.isEmpty()) {
+				log.info("downloadLink could not be extracted");
+				return Optional.empty();
+			}
+			log.info("downloadLink extracted: " + downloadLink.get());
 
 			log.info("Downloading file...");
 			String fileName = String.format("%s-%s_%s%s",
@@ -97,143 +115,109 @@ public class NotionClient {
 					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm")),
 					EXPORT_FILE_EXTENSION);
 			// This will override the already existing file
-			downloadedFile = downloadToFile(downloadLink, new java.io.File(fileName));
+			downloadedFile = downloadToFile(downloadLink.get(), new java.io.File(fileName));
+			// downloadedFile = downloadToFile(downloadLink, new java.io.File(fileName));
 			log.info("Download finished: {}", downloadedFile.getName());
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			log.warn("Exception during export", e);
 		}
 		return Optional.ofNullable(downloadedFile);
 	}
 
 
-	private File downloadToFile(String url, File destinationFile) throws IOException {
-		Request request = new Request.Builder()
-				.url(url)
+	private File downloadToFile(String url, File destinationFile) throws IOException, InterruptedException {
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.GET()
 				.build();
-		try (Response response = okHttpClient.newCall(request).execute()) {
-			InputStream in = response.body().byteStream();
-			FileUtils.copyInputStreamToFile(in, destinationFile);
-			return destinationFile;
-		}
+
+		newClient.send(request, HttpResponse.BodyHandlers.ofFile(destinationFile.toPath()));
+
+		return destinationFile;
 	}
 
 
 	// TODO create gist
-	private String getTokenV2() throws IOException {
+	private Optional<String> getTokenV2() throws IOException, InterruptedException {
 		String credentialsTemplate = "{" +
 				"\"email\": \"%s\"," +
 				"\"password\": \"%s\"" +
 				"}";
 		String credentialsJson = String.format(credentialsTemplate, notionEmail, notionPassword);
-		Request request = new Request.Builder()
-				.url(LOGIN_ENDPOINT)
-				.post(RequestBody.create(credentialsJson, MEDIA_TYPE_JSON))
-				.build();
-		try (Response response = okHttpClient.newCall(request).execute()) {
-			return cookieJar.loadForRequest(request.url()).stream()
-					.filter(cookie -> TOKEN_V2.equals(cookie.name()))
-					.findFirst()
-					.orElseThrow()
-					.value();
-		}
-	}
 
-	//	private String getTokenV2OLD() throws IOException {
-	//		String credentialsTemplate = "{" +
-	//				"\"email\": \"%s\"," +
-	//				"\"password\": \"%s\"" +
-	//				"}";
-	//		String credentialsJson = String.format(credentialsTemplate, notionEmail, notionPassword);
-	//
-	//		HttpPost loginRequest = new HttpPost(LOGIN_ENDPOINT);
-	//		loginRequest.setEntity(new StringEntity(credentialsJson, ContentType.APPLICATION_JSON));
-	//		try (CloseableHttpResponse response = httpClient.execute(loginRequest)) {
-	//			List<Cookie> cookies = cookieStore.getCookies();
-	//			return extractTokenV2(cookies);
-	//		}
-	//	}
-
-	//	private String extractTokenV2(List<Cookie> cookies) {
-	//		return cookies.stream()
-	//				.filter(cookie -> TOKEN_V2.equals(cookie.getName()))
-	//				.findFirst()
-	//				.orElseThrow()
-	//				.getValue();
-	//	}
-
-
-	private String triggerExportTask(String tokenV2) throws IOException {
-		Request request = new Request.Builder()
-				.url(ENQUEUE_ENDPOINT)
-				.addHeader("Cookie", TOKEN_V2 + "=" + tokenV2)
-				.post(RequestBody.create(getTaskJson(), MEDIA_TYPE_JSON))
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(LOGIN_ENDPOINT))
+				.POST(HttpRequest.BodyPublishers.ofString(credentialsJson))
+				.header("Content-Type", "application/json")
 				.build();
 
-		try (Response response = okHttpClient.newCall(request).execute()) {
-			JsonNode responseJsonNode = objectMapper.readTree(response.body().string());
-			return responseJsonNode.get("taskId").asText();
+		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
+		System.out.println("response: " + response);
+
+		if (response.statusCode() == 429) {
+			log.warn("Too many requests were sent. Notion is returning a 429 status code (Too many requests).");
+			return Optional.empty();
 		}
+
+		return Optional.of(cookieManager.getCookieStore()
+				.get(URI.create(LOGIN_ENDPOINT))
+				.stream()
+				.filter(cookie -> TOKEN_V2.equals(cookie.getName()))
+				.findFirst()
+				.orElseThrow()
+				.getValue());
+
 	}
 
-	// TODO add as snippet -> HttpClient setCooke, PostRequest
-	//	private String triggerExportTaskOLD(String tokenV2) throws IOException {
-	//		HttpPost postRequest = new HttpPost(ENQUEUE_ENDPOINT);
-	//		postRequest.addHeader("Cookie", TOKEN_V2 + "=" + tokenV2);
-	//		postRequest.setEntity(new StringEntity(getTaskJson(), ContentType.APPLICATION_JSON));
-	//
-	//		try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-	//			String responseAsString = EntityUtils.toString(response.getEntity());
-	//			JsonNode responseJsonNode = objectMapper.readTree(responseAsString);
-	//			return responseJsonNode.get("taskId").asText();
-	//		}
-	//	}
 
-	//	private String getDownloadLinkOLD(String taskId, String tokenV2) throws IOException {
-	//		HttpPost taskStatusRequest = new HttpPost(GET_TASKS_ENDPOINT);
-	//		taskStatusRequest.addHeader("Cookie", TOKEN_V2 + "=" + tokenV2);
-	//		String postBody = String.format("{\"taskIds\": [\"%s\"]}", taskId);
-	//		taskStatusRequest.setEntity(new StringEntity(postBody, ContentType.APPLICATION_JSON));
-	//
-	//		for (int i = 0; i < 10; i++) {
-	//			try (CloseableHttpResponse responseForTasks = httpClient.execute(taskStatusRequest)) {
-	//				String responseAsString = EntityUtils.toString(responseForTasks.getEntity());
-	//				JsonNode taskResultJsonNode = objectMapper.readTree(responseAsString);
-	//				// TODO find result with correct id
-	//				String state = taskResultJsonNode.get("results").get(0).get("state").asText();
-	//				log.info("state: " + state);
-	//
-	//				if ("success".equals(state)) {
-	//					return taskResultJsonNode.get("results").get(0).get("status").get("exportURL").asText();
-	//				}
-	//				sleep(4000);
-	//			}
-	//		}
-	//		// TODO
-	//		return "";
-	//	}
+	private String triggerExportTask(String tokenV2) throws IOException, InterruptedException {
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(ENQUEUE_ENDPOINT))
+				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
+				.header("Content-Type", "application/json")
+				.POST(HttpRequest.BodyPublishers.ofString(getTaskJson()))
+				.build();
+
+		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+		JsonNode responseJsonNode = objectMapper.readTree(response.body());
+		return responseJsonNode.get("taskId").asText();
+	}
 
 
-	private String getDownloadLink(String taskId, String tokenV2) throws IOException {
+	private Optional<String> getDownloadLink(String taskId, String tokenV2) throws IOException, InterruptedException {
 		String postBody = String.format("{\"taskIds\": [\"%s\"]}", taskId);
-		Request request = new Request.Builder()
-				.url(GET_TASKS_ENDPOINT)
-				.addHeader("Cookie", TOKEN_V2 + "=" + tokenV2)
-				.post(RequestBody.create(postBody, MEDIA_TYPE_JSON))
+
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(GET_TASKS_ENDPOINT))
+				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
+				.header("Content-Type", "application/json")
+				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
-		for (int i = 0; i < 10; i++) {
-			try (Response response = okHttpClient.newCall(request).execute()) {
-				JsonNode responseJsonNode = objectMapper.readTree(response.body().string());
-				// TODO find result with correct id
-				String state = responseJsonNode.get("results").get(0).get("state").asText();
-				log.info("state: " + state);
-				if ("success".equals(state)) {
-					return responseJsonNode.get("results").get(0).get("status").get("exportURL").asText();
+
+		for (int i = 0; i < 20; i++) {
+			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
+			System.out.println("response.body(): " + response.body());
+
+			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
+			Results results = objectMapper.readValue(response.body(), Results.class);
+
+			if (!results.getResults().isEmpty()) {
+				Result result = results.getResults().stream().findFirst().get();
+				log.info("state: " + result.getState());
+
+				if (result.getStatus() != null) {
+					log.info("pagesExported: " + result.getStatus().getPagesExported());
 				}
-				sleep(4000);
+
+				if (result.isSuccess()) {
+					return Optional.of(result.getStatus().getExportUrl());
+				}
 			}
+
+			sleep(4000);
 		}
-		//		TODO
-		return "";
+		return Optional.empty();
 	}
 
 

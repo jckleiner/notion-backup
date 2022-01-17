@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DropboxServiceFactory {
 
-	// Logic for creating a dropbox service
 	public static Optional<DbxClientV2> create(String dropboxAccessToken) {
 		if (StringUtils.isBlank(dropboxAccessToken)) {
 			log.warn("The given dropboxAccessToken is blank.");
