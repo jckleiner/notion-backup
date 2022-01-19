@@ -159,7 +159,6 @@ public class NotionClient {
 				.build();
 
 		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
-		System.out.println("response: " + response);
 
 		if (response.statusCode() == 429) {
 			log.warn("Too many requests were sent. Notion is returning a 429 status code (Too many requests).");
