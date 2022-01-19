@@ -11,19 +11,21 @@ on:
   schedule:
     - cron: '5 4 * * *'
 
+# See https://github.com/marketplace/actions/docker-run-step
+
 jobs:
-  container1:
+  run:
     runs-on: ubuntu-latest
-    container: jckleiner/notion-backup
     steps:
-      - uses: actions/checkout@v2
-      - env:
-          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
-          NOTION_EMAIL: ${{ secrets.NOTION_EMAIL }}
-          NOTION_PASSWORD: ${{ secrets.NOTION_PASSWORD }}
+      - uses: kohlerdominik/docker-run-action@v1
+        with:
+          # public, private or local image
+          image: jckleiner/notion-backup
+          # pass or create environment variables
+          environment: |
+            NOTION_SPACE_ID=${{ secrets.NOTION_SPACE_ID }}
+            NOTION_EMAIL=${{ secrets.NOTION_EMAIL }}
+            NOTION_PASSWORD=${{ secrets.NOTION_PASSWORD }}
+            
+            DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
 
-          #GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
-          #GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
-          #GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH:
-
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
