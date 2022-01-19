@@ -28,4 +28,6 @@ jobs:
             NOTION_PASSWORD=${{ secrets.NOTION_PASSWORD }}
             
             DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
-
+          run: |
+                echo "hello world"
+                uname -a
