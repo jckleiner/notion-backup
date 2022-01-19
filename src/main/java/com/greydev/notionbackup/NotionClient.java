@@ -209,10 +209,9 @@ public class NotionClient {
 
 			if (!results.getResults().isEmpty()) {
 				Result result = results.getResults().stream().findFirst().get();
-				log.info("State: " + result.getState());
 
 				if (result.getStatus() != null) {
-					log.info("Pages exported: " + result.getStatus().getPagesExported());
+					log.info("State: '{}', Pages exported: {}", result.getState(), result.getStatus().getPagesExported());
 				}
 
 				if (result.isSuccess()) {
