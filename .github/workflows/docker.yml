@@ -1,0 +1,29 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: notion-backup-docker-workflow
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  schedule:
+    - cron: '5 4 * * *'
+
+jobs:
+  container1:
+    runs-on: ubuntu-latest
+    container: jckleiner/notion-backup
+    steps:
+      - uses: actions/checkout@v2
+      - env:
+          NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+          NOTION_EMAIL: ${{ secrets.NOTION_EMAIL }}
+          NOTION_PASSWORD: ${{ secrets.NOTION_PASSWORD }}
+
+          #GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
+          #GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
+          #GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH:
+
+          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
