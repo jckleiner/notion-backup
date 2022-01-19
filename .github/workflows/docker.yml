@@ -13,8 +13,11 @@ on:
 
 # See https://github.com/marketplace/actions/docker-run-step
 
+# TODO: WARNING: The requested image's platform (linux/arm64/v8) does not match the
+# detected host platform (linux/amd64) and no specific platform was requested
+
 jobs:
-  run:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: kohlerdominik/docker-run-action@v1

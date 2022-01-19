@@ -39,7 +39,7 @@ public class NotionClient {
 	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
 	private static final String KEY_EXPORT_TYPE = "EXPORT_TYPE";
 	private static final String DEFAULT_EXPORT_TYPE = "markdown";
-	private static final String DOWNLOADS_DIR = "downloads";
+	private static final String DOWNLOADS_DIR = "/downloads";
 
 	private final String notionSpaceId;
 	private final String notionEmail;
