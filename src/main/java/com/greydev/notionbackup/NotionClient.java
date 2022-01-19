@@ -107,7 +107,10 @@ public class NotionClient {
 					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")),
 					EXPORT_FILE_EXTENSION);
 
+			log.info("DOWNLOADS_DIR: " + DOWNLOADS_DIR);
+			log.info("fileName: " + fileName);
 			Path downloadPath = Path.of(DOWNLOADS_DIR, fileName);
+			log.info("downloadPath: " + downloadPath);
 			Optional<File> downloadedFile = downloadToFile(downloadLink.get(), downloadPath);
 
 			if (downloadedFile.isEmpty() || !downloadedFile.get().isFile()) {
