@@ -2,33 +2,26 @@ package com.greydev.notionbackup;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.CookiePolicy;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.protocol.HTTP;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.api.client.http.HttpStatusCodes;
+import com.greydev.notionbackup.model.Result;
+import com.greydev.notionbackup.model.Results;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 
 
 @Slf4j
@@ -46,6 +39,7 @@ public class NotionClient {
 	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
 	private static final String KEY_EXPORT_TYPE = "EXPORT_TYPE";
 	private static final String DEFAULT_EXPORT_TYPE = "markdown";
+	private static final String DOWNLOADS_DIR = "downloads";
 
 	private final String notionSpaceId;
 	private final String notionEmail;
@@ -67,13 +61,14 @@ public class NotionClient {
 		notionEmail = dotenv.get(KEY_NOTION_EMAIL);
 		notionPassword = dotenv.get(KEY_NOTION_PASSWORD);
 		exportType = StringUtils.isNotBlank(dotenv.get(KEY_EXPORT_TYPE)) ? dotenv.get(KEY_EXPORT_TYPE) : DEFAULT_EXPORT_TYPE;
-		log.info("Using export type: {}", exportType);
 
-		exitIfRequiredEnvVariablesNotSet();
+		exitIfRequiredEnvVariablesNotValid();
+
+		log.info("Using export type: {}", exportType);
 	}
 
 
-	private void exitIfRequiredEnvVariablesNotSet() {
+	private void exitIfRequiredEnvVariablesNotValid() {
 		if (StringUtils.isBlank(notionSpaceId)) {
 			exit(KEY_NOTION_SPACE_ID + " is missing!");
 		}
@@ -87,53 +82,62 @@ public class NotionClient {
 
 
 	public Optional<File> export() {
-		File downloadedFile = null;
 		try {
 			Optional<String> tokenV2 = getTokenV2();
 			if (tokenV2.isEmpty()) {
 				log.info("tokenV2 could not be extracted");
 				return Optional.empty();
 			}
-			// TODO delete token log
-			log.info("tokenV2 extracted: " + tokenV2);
+			log.info("tokenV2 extracted");
 
 			String taskId = triggerExportTask(tokenV2.get());
-			// TODO delete token log
-			log.info("taskId extracted: " + taskId);
+			log.info("taskId extracted");
 
 			Optional<String> downloadLink = getDownloadLink(taskId, tokenV2.get());
 			if (downloadLink.isEmpty()) {
 				log.info("downloadLink could not be extracted");
 				return Optional.empty();
 			}
-			log.info("downloadLink extracted: " + downloadLink.get());
+			log.info("Download link extracted");
 
 			log.info("Downloading file...");
 			String fileName = String.format("%s-%s_%s%s",
 					EXPORT_FILE_NAME,
 					exportType,
-					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm")),
+					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")),
 					EXPORT_FILE_EXTENSION);
-			// This will override the already existing file
-			downloadedFile = downloadToFile(downloadLink.get(), new java.io.File(fileName));
-			// downloadedFile = downloadToFile(downloadLink, new java.io.File(fileName));
-			log.info("Download finished: {}", downloadedFile.getName());
+
+			Path downloadPath = Path.of(DOWNLOADS_DIR, fileName);
+			Optional<File> downloadedFile = downloadToFile(downloadLink.get(), downloadPath);
+
+			if (downloadedFile.isEmpty() || !downloadedFile.get().isFile()) {
+				log.info("Could not download file");
+				return Optional.empty();
+			}
+
+			log.info("Download finished: {}", downloadedFile.get().getName());
+			return downloadedFile;
 		} catch (IOException | InterruptedException e) {
 			log.warn("Exception during export", e);
 		}
-		return Optional.ofNullable(downloadedFile);
+		return Optional.empty();
 	}
 
 
-	private File downloadToFile(String url, File destinationFile) throws IOException, InterruptedException {
+	private Optional<File> downloadToFile(String url, Path downloadPath) {
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(url))
 				.GET()
 				.build();
 
-		newClient.send(request, HttpResponse.BodyHandlers.ofFile(destinationFile.toPath()));
-
-		return destinationFile;
+		try {
+			log.info("Downloading file to: '{}'", downloadPath);
+			newClient.send(request, HttpResponse.BodyHandlers.ofFile(downloadPath));
+			return Optional.of(downloadPath.toFile());
+		} catch (IOException | InterruptedException e) {
+			log.warn("Exception during file download", e);
+			return Optional.empty();
+		}
 	}
 
 
@@ -197,17 +201,16 @@ public class NotionClient {
 
 		for (int i = 0; i < 20; i++) {
 			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println("response.body(): " + response.body());
 
 			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
 			Results results = objectMapper.readValue(response.body(), Results.class);
 
 			if (!results.getResults().isEmpty()) {
 				Result result = results.getResults().stream().findFirst().get();
-				log.info("state: " + result.getState());
+				log.info("State: " + result.getState());
 
 				if (result.getStatus() != null) {
-					log.info("pagesExported: " + result.getStatus().getPagesExported());
+					log.info("Pages exported: " + result.getStatus().getPagesExported());
 				}
 
 				if (result.isSuccess()) {
@@ -247,7 +250,6 @@ public class NotionClient {
 
 	private void sleep(int ms) {
 		try {
-			log.info("sleeping for {}ms", ms);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 			log.error("An exception occurred: ", e);

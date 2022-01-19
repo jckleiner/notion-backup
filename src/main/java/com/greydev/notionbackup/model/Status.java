@@ -1,4 +1,4 @@
-package com.greydev.notionbackup;
+package com.greydev.notionbackup.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

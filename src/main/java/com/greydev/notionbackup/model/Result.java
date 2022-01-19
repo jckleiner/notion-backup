@@ -1,12 +1,10 @@
-package com.greydev.notionbackup;
+package com.greydev.notionbackup.model;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,8 +1,6 @@
-package com.greydev.notionbackup;
+package com.greydev.notionbackup.model;
 
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

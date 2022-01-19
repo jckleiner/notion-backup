@@ -2,22 +2,12 @@ package com.greydev.notionbackup;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import com.dropbox.core.v2.DbxClientV2;
 import com.google.api.services.drive.Drive;
@@ -35,11 +25,12 @@ public class NotionBackup {
 
 	// TODO if export limit exceeded, print response
 	// TODO add tests, mockito
-	// TODO testing with okhttp's mock server?
 	// TODO test where the download will go if the path is "exportFolder/", will the jar create it in the pwd?
 	// TODO make a common interface, make a list, loop and call upload on each, make upload async
 	// TODO where and how to handle errors
 	// 	if no key is given, we don't want to stop the whole app, just ignore the upload call with logs
+
+	// Nextcloud - https://docs.nextcloud.com/server/latest/developer_manual/client_apis/WebDAV/basic.html#uploading-files
 
 	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
 
@@ -53,17 +44,21 @@ public class NotionBackup {
 		dotenv = initDotenv();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		NotionClient notionClient = new NotionClient(dotenv);
-		final File exportedFile = notionClient.export()
-				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
+
+		// File file = new File("downloads/my-test-file.txt");
+		// FileUtils.writeStringToFile(file, "hello world", StandardCharsets.UTF_8);
+
+		// final File exportedFile = notionClient.export()
+		// 		.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
 
 		// use a local file to skip the notion export step
-		// final File exportedFile = new File("notion-export-markdown_2022-01-17_22-39.zip");
+		final File exportedFile = new File("notion-export-markdown_2022-01-17_22-39.zip");
 
 		// CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
-		// CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
-		// futureDropbox.join();
+		CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
+		futureDropbox.join();
 		// CompletableFuture.allOf(futureGoogleDrive, futureDropbox).join();
 	}
 
@@ -148,19 +143,6 @@ public class NotionBackup {
 			throw new IllegalStateException("Could not load dotenv!");
 		}
 		return dotenv;
-	}
-
-	//		CookieStore cookieStore = new BasicCookieStore();
-	//		CloseableHttpClient httpClient = initHttpClient(cookieStore);
-
-
-	public static CloseableHttpClient initHttpClient(CookieStore cookieStore) {
-		// Prevent warning 'Invalid cookie header' warning by setting a cookie spec
-		// Also adding a cookie store to be able to access the cookies
-		return HttpClients.custom()
-				.setDefaultCookieStore(cookieStore)
-				.setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build())
-				.build();
 	}
 
 }
