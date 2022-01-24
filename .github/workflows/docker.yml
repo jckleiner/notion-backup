@@ -28,7 +28,3 @@ jobs:
             NOTION_PASSWORD=${{ secrets.NOTION_PASSWORD }}
             
             DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
-          # run is a must, without it the job throws an error
-          run: |
-            echo "hello world"
-            uname -a
