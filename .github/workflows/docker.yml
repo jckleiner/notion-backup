@@ -12,6 +12,7 @@ on:
     - cron: '5 4 * * *'
 
 # See https://github.com/marketplace/actions/docker-run-step
+# See https://github.com/addnab/docker-run-action
 
 jobs:
   build:
@@ -28,3 +29,7 @@ jobs:
             NOTION_PASSWORD=${{ secrets.NOTION_PASSWORD }}
             
             DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
+          # run is required: "Error: Input required and not supplied: run"
+          run: |
+            echo "hello world"
+            uname -a
