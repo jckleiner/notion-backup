@@ -15,6 +15,7 @@ import com.greydev.notionbackup.cloudstorage.dropbox.DropboxClient;
 import com.greydev.notionbackup.cloudstorage.dropbox.DropboxServiceFactory;
 import com.greydev.notionbackup.cloudstorage.googledrive.GoogleDriveClient;
 import com.greydev.notionbackup.cloudstorage.googledrive.GoogleDriveServiceFactory;
+import com.greydev.notionbackup.cloudstorage.nextcloud.NextcloudClient;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,10 @@ public class NotionBackup {
 
 	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
 
+	public static final String KEY_NEXTCLOUD_EMAIL = "NEXTCLOUD_EMAIL";
+	public static final String KEY_NEXTCLOUD_PASSWORD = "NEXTCLOUD_PASSWORD";
+	public static final String KEY_NEXTCLOUD_WEBDAV_URL = "NEXTCLOUD_WEBDAV_URL";
+
 	private static final String KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID = "GOOGLE_DRIVE_ROOT_FOLDER_ID";
 	private static final String KEY_GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON = "GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON";
 	private static final String KEY_GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH = "GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH";
@@ -43,33 +48,36 @@ public class NotionBackup {
 	public static void main(String[] args) {
 		NotionClient notionClient = new NotionClient(dotenv);
 
-		final File exportedFile = notionClient.export()
-				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
+		// final File exportedFile = notionClient.export()
+		// 		.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
 
 		// use a local file to skip the notion export step
-		// final File exportedFile = new File("notion-export-markdown_2022-01-17_22-39.zip");
+		final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");
 
-		CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
-		CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
+		// CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
+		// CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
+		CompletableFuture<Void> futureNextcloud = CompletableFuture.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile));
 
-		CompletableFuture.allOf(futureGoogleDrive, futureDropbox).join();
+		futureNextcloud.join();
+
+		// CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud).join();
 	}
 
 
 	public static void startGoogleDriveBackup(File fileToUpload) {
 		Optional<String> serviceAccountSecretOptional = extractGoogleServiceAccountSecret();
 		if (serviceAccountSecretOptional.isEmpty()) {
-			log.info("No secret provided for Google Drive. Skipping Google Drive upload.");
+			log.info("Skipping Google Drive upload. No secret provided for Google Drive.");
 			return;
 		}
 		Optional<Drive> googleServiceOptional = GoogleDriveServiceFactory.create(serviceAccountSecretOptional.get());
 		if (googleServiceOptional.isEmpty()) {
-			log.warn("Could not create Google Drive service. Skipping Google Drive upload.");
+			log.warn("Skipping Google Drive upload. Could not create Google Drive service.");
 			return;
 		}
 		String googleDriveRootFolderId = dotenv.get(KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID);
 		if (StringUtils.isBlank(googleDriveRootFolderId)) {
-			log.info("{} is blank. Skipping Google Drive upload.", KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID);
+			log.info("Skipping Google Drive upload. {} is blank.", KEY_GOOGLE_DRIVE_ROOT_FOLDER_ID);
 			return;
 		}
 		GoogleDriveClient GoogleDriveClient = new GoogleDriveClient(googleServiceOptional.get(), googleDriveRootFolderId);
@@ -81,7 +89,7 @@ public class NotionBackup {
 		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
 
 		if (StringUtils.isBlank(dropboxAccessToken)) {
-			log.info("{} is blank. Skipping Dropbox upload.", KEY_DROPBOX_ACCESS_TOKEN);
+			log.info("Skipping Dropbox upload. {} is blank.", KEY_DROPBOX_ACCESS_TOKEN);
 			return;
 		}
 		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken);
@@ -91,6 +99,20 @@ public class NotionBackup {
 		}
 		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
 		dropboxClient.upload(fileToUpload);
+	}
+
+
+	public static void startNextcloudBackup(File fileToUpload) {
+		String email = dotenv.get(KEY_NEXTCLOUD_EMAIL);
+		String password = dotenv.get(KEY_NEXTCLOUD_PASSWORD);
+		String webdavUrl = dotenv.get(KEY_NEXTCLOUD_WEBDAV_URL);
+
+		if (StringUtils.isAnyBlank(email, password, webdavUrl)) {
+			log.info("Skipping Nextcloud upload. {}, {} or {} is blank.", KEY_NEXTCLOUD_EMAIL, KEY_NEXTCLOUD_PASSWORD, KEY_NEXTCLOUD_WEBDAV_URL);
+			return;
+		}
+
+		new NextcloudClient(email, password, webdavUrl).upload(fileToUpload);
 	}
 
 
