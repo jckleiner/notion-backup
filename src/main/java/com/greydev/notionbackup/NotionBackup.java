@@ -23,14 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NotionBackup {
 
-	// TODO if export limit exceeded, print response
+	// TODO add another github action: build the docker container, push it to my repo and then run
+	// TODO add those actions to gists
+	// TODO add Nextcloud upload- https://docs.nextcloud.com/server/latest/developer_manual/client_apis/WebDAV/basic.html#uploading-files
 	// TODO add tests, mockito
-	// TODO test where the download will go if the path is "exportFolder/", will the jar create it in the pwd?
-	// TODO make a common interface, make a list, loop and call upload on each, make upload async
-	// TODO where and how to handle errors
-	// 	if no key is given, we don't want to stop the whole app, just ignore the upload call with logs
-
-	// Nextcloud - https://docs.nextcloud.com/server/latest/developer_manual/client_apis/WebDAV/basic.html#uploading-files
 
 	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
 

@@ -28,7 +28,7 @@ Create a `.env` file with the following properties ([how to find all these value
 
 ### Docker
 
-Once you created you `.env` file, you can run the following command to start your backup:
+Once you created your `.env` file, you can run the following command to start your backup:
 
 ```bash
 docker run \
@@ -64,7 +64,7 @@ Another way ...
 
 ## Troubleshoot
 
-If you got an Exception like this: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try
+If you get the exception: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try
 to re-generate your access token and run the application again.
 
 

@@ -8,6 +8,19 @@
 
 ![testImage](../images/notion-search-request.png)
 
+
+### Dropbox
+
+TODO: GIF
+
+1. Create a new app on developer console (https://www.dropbox.com/developers/apps/create)
+2. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your
+   changes. Make sure you saved these changes **before** you generate your access token
+3. Go to Settings > OAuth 2 > Generate access token > generate > Access token expiration: "no expiration" and copy the
+   generated token
+
+> Long-lived tokens are less secure and will be deprecated in the future.
+
 ### Google Drive
 
 1. Login to your [google developer console](https://console.developers.google.com/)
@@ -30,15 +43,3 @@
     looks like XXX@XXX.iam.gserviceaccount.com)
 14. TODO - Copy the id of that folder, from the URL
 15. You are now ready to setup the application. Go to TODO - link to setup...
-
-### Dropbox
-
-TODO: GIF
-
-1. Create a new app on developer console (https://www.dropbox.com/developers/apps/create)
-2. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your
-   changes. Make sure you saved these changes **before** you generate your access token
-3. Go to Settings > OAuth 2 > Generate access token > generate > Access token expiration: "no expiration" and copy the
-   generated token
-
-> Long-lived tokens are less secure and will be deprecated in the future.
