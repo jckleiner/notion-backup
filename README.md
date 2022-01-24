@@ -9,22 +9,23 @@ see also https://github.com/openownership/notion-backup
 
 ### Set Credentials
 
-Create a `.env` file with the following properties ([how to find all these values](./documentation/setup.md)):
+Create a `.env` file with the following properties ([How do I find all these values?](./documentation/setup.md)):
 
     # Make sure not to use any quotes around these environment variables
     
-    # Required
-    NOTION_SPACE_ID=1234-56789-abcdef
-    NOTION_EMAIL=notion@example.com
-    NOTION_PASSWORD=password
+    # Notion (Required)
+    NOTION_SPACE_ID=
+    NOTION_EMAIL=
+    NOTION_PASSWORD=
 
-    # Optional
-    GOOGLE_DRIVE_ROOT_FOLDER_ID=<get-the-folder-id-from-google-drive>
-    GOOGLE_DRIVE_SERVICE_ACCOUNT=<get-the-service-account-info-from-1password>
+    # Google (Optional)
+    GOOGLE_DRIVE_ROOT_FOLDER_ID=
+    GOOGLE_DRIVE_SERVICE_ACCOUNT=
     GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=
-    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=<file-path-to-json-credentials-file>
-    
-    DROPBOX_ACCESS_TOKEN=<generate-token-from-dropbox-developer-console>
+    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=
+
+    # Dropbox (Optional)
+    DROPBOX_ACCESS_TOKEN=
 
 
 
@@ -75,5 +76,5 @@ to re-generate your access token and run the application again.
 ## TODO:
 
 1. Create gifs for readme, update readme, document also how github actions work in this project
-2. upload files to Nextcloud
-3. upload files to a Git Repo
+2. Upload files to Nextcloud
+3. Upload files to a Git Repo
