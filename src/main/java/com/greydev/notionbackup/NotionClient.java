@@ -37,8 +37,8 @@ public class NotionClient {
 	private static final String KEY_NOTION_SPACE_ID = "NOTION_SPACE_ID";
 	private static final String KEY_NOTION_EMAIL = "NOTION_EMAIL";
 	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
-	private static final String KEY_EXPORT_TYPE = "EXPORT_TYPE";
-	private static final String DEFAULT_EXPORT_TYPE = "markdown";
+	private static final String KEY_NOTION_EXPORT_TYPE = "NOTION_EXPORT_TYPE";
+	private static final String DEFAULT_NOTION_EXPORT_TYPE = "markdown";
 	private static final String DOWNLOADS_DIR = "/downloads";
 
 	private final String notionSpaceId;
@@ -60,7 +60,7 @@ public class NotionClient {
 		notionSpaceId = dotenv.get(KEY_NOTION_SPACE_ID);
 		notionEmail = dotenv.get(KEY_NOTION_EMAIL);
 		notionPassword = dotenv.get(KEY_NOTION_PASSWORD);
-		exportType = StringUtils.isNotBlank(dotenv.get(KEY_EXPORT_TYPE)) ? dotenv.get(KEY_EXPORT_TYPE) : DEFAULT_EXPORT_TYPE;
+		exportType = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_EXPORT_TYPE)) ? dotenv.get(KEY_NOTION_EXPORT_TYPE) : DEFAULT_NOTION_EXPORT_TYPE;
 
 		exitIfRequiredEnvVariablesNotValid();
 
@@ -110,7 +110,6 @@ public class NotionClient {
 			log.info("DOWNLOADS_DIR: " + DOWNLOADS_DIR);
 			log.info("fileName: " + fileName);
 			Path downloadPath = Path.of(DOWNLOADS_DIR, fileName);
-			log.info("downloadPath: " + downloadPath);
 			Optional<File> downloadedFile = downloadToFile(downloadLink.get(), downloadPath);
 
 			if (downloadedFile.isEmpty() || !downloadedFile.get().isFile()) {

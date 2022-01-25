@@ -1,6 +1,3 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
 name: notion-backup-docker-workflow
 
 on:
@@ -8,6 +5,8 @@ on:
     branches: [ develop ]
   pull_request:
     branches: [ develop ]
+
+  # will be triggered each day at 04:05
   schedule:
     - cron: '5 4 * * *'
 
@@ -28,8 +27,21 @@ jobs:
             NOTION_EMAIL=${{ secrets.NOTION_EMAIL }}
             NOTION_PASSWORD=${{ secrets.NOTION_PASSWORD }}
             
+            GOOGLE_DRIVE_ROOT_FOLDER_ID=${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
+            GOOGLE_DRIVE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
+            GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
+            GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH }}
+            
             DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
+            
+            NEXTCLOUD_EMAIL=${{ secrets.NEXTCLOUD_EMAIL }}
+            NEXTCLOUD_PASSWORD=${{ secrets.NEXTCLOUD_PASSWORD }}
+            NEXTCLOUD_WEBDAV_URL=${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+
           # run is required: "Error: Input required and not supplied: run"
           run: |
             echo "hello world"
             uname -a
+
+
+

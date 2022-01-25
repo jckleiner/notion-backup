@@ -6,7 +6,6 @@
 
 see also https://github.com/openownership/notion-backup
 
-
 ### Set Credentials
 
 Create a `.env` file with the following properties ([How do I find all these values?](./documentation/setup.md)):
@@ -18,6 +17,9 @@ Create a `.env` file with the following properties ([How do I find all these val
     NOTION_EMAIL=
     NOTION_PASSWORD=
 
+    # Default is markdown.
+    NOTION_EXPORT_TYPE=markdown
+
     # Google (Optional)
     GOOGLE_DRIVE_ROOT_FOLDER_ID=
     GOOGLE_DRIVE_SERVICE_ACCOUNT=
@@ -27,9 +29,12 @@ Create a `.env` file with the following properties ([How do I find all these val
     # Dropbox (Optional)
     DROPBOX_ACCESS_TOKEN=
 
+    # Nextcloud (Optional)
+    NEXTCLOUD_EMAIL=
+    NEXTCLOUD_PASSWORD=
+    NEXTCLOUD_WEBDAV_URL=
 
-
-### Docker
+### Backup to Cloud with Docker
 
 Once you created your `.env` file, you can run the following command to start your backup:
 
@@ -40,11 +45,14 @@ docker run \
     jckleiner/notion-backup
 ```
 
-The exported files will be saved to the `/downloads` folder in the Docker container and the container will be 
-removed when the backup is done (because of the `--rm=true` flag).
+The downloaded Notion export file will be saved to the `/downloads` folder in the Docker container and the container 
+will be removed
+after the backup is done (because of the `--rm=true` flag).
 
-If you want to keep the downloaded files locally, you could mount the `/downloads` folder from the container 
-somewhere on your machine:
+### Local Backup with Docker
+
+If you want to keep the downloaded files locally, you could mount the `/downloads` folder from the container somewhere
+on your machine:
 
 ```bash
 docker run \
@@ -58,23 +66,22 @@ You could also set a cronjob if you want trigger backups in regular intervals.
 
 ### Fork (GitHub Actions)
 
-Another way ...
+Another way to do automated backups is using GitHub Actions. You can simply:
 
-1. Create repository secrets for the following variables:
-
-2. Fork this repository. That's it!
-
+1. Fork this repository.
+2. Create repository secrets: Go to `notion-backup > Settings > Secrets > Actions` and create all
+   the [necessary environment variables](#set-credentials).
+3. You can adjust when the action will be triggered by editing your `notion-backup/.github/workflows/docker.yml`
+   workflow file.
 
 ## Troubleshoot
 
 ### Dropbox
 
-If you get the exception: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try
-to re-generate your access token and run the application again.
-
+If you get the exception: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try to
+re-generate your access token and run the application again.
 
 ## TODO:
 
 1. Create gifs for readme, update readme, document also how github actions work in this project
-2. Upload files to Nextcloud
-3. Upload files to a Git Repo
+2. Upload files to a Git Repo

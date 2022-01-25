@@ -48,19 +48,17 @@ public class NotionBackup {
 	public static void main(String[] args) {
 		NotionClient notionClient = new NotionClient(dotenv);
 
-		// final File exportedFile = notionClient.export()
-		// 		.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
+		final File exportedFile = notionClient.export()
+				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
 
 		// use a local file to skip the notion export step
-		final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");
+		// final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");
 
-		// CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
-		// CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
+		CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
+		CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
 		CompletableFuture<Void> futureNextcloud = CompletableFuture.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile));
 
-		futureNextcloud.join();
-
-		// CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud).join();
+		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud).join();
 	}
 
 
