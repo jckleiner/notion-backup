@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public class GoogleDriveServiceFactory {
 
 	private static final String OAUTH_SCOPE_GOOGLE_DRIVE = "https://www.googleapis.com/auth/drive";
-	// TODO do we need an application name?
 	private static final String APPLICATION_NAME = "NOTION-BACKUP";
 
 
@@ -42,7 +41,7 @@ public class GoogleDriveServiceFactory {
 					.setApplicationName(APPLICATION_NAME)
 					.build();
 		} catch (IOException | GeneralSecurityException e) {
-			log.error("TODO", e);
+			log.error("Error during google drive build step", e);
 		}
 		return Optional.ofNullable(drive);
 	}

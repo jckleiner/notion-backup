@@ -18,7 +18,6 @@ public class GoogleDriveClient implements CloudStorageClient {
 	private final String googleDriveRootFolderId;
 
 
-	// TODO inject
 	public GoogleDriveClient(Drive driveService, String googleDriveRootFolderId) {
 		this.driveService = driveService;
 		this.googleDriveRootFolderId = googleDriveRootFolderId;
@@ -26,16 +25,6 @@ public class GoogleDriveClient implements CloudStorageClient {
 
 
 	public boolean upload(java.io.File fileToUpload) {
-
-		/* TODO how people normally you would process XML:
-			TODO Create examples for every one of them
-			1. Like I did with classes and annotations
-			2. Something like swagger
-			3. XSLD?
-		 */
-		// TODO how to get parent folder id from the api?
-		// TODO refactor EXPORT_FILE_NAME date and extension
-		// TODO Create a new directory each month?
 
 		// create a file
 		/*
@@ -56,74 +45,15 @@ public class GoogleDriveClient implements CloudStorageClient {
 		fileMetadata.setName(fileToUpload.getName());
 		fileMetadata.setParents(Collections.singletonList(googleDriveRootFolderId));
 		try {
-			File file = driveService.files().create(fileMetadata, notionExportFileContent)
+			driveService.files().create(fileMetadata, notionExportFileContent)
 					.setFields("id, parents")
 					.execute();
-			// TODO check if exists?
 		} catch (IOException e) {
 			log.warn("Google Drive: IOException ", e);
 			return false;
 		}
-		log.info("Google Drive: Successfully uploaded '{}'", fileToUpload.getName());
+		log.info("Google Drive: successfully uploaded '{}'", fileToUpload.getName());
 		return true;
 	}
-
-
-	@Override
-	public boolean doesFileExist(String fileName) {
-		return false;
-	}
-
-	//	private String upload() throws FileNotFoundException {
-	//		HttpPost post = new HttpPost("http://echo.200please.com");
-	//		InputStream inputStream = new FileInputStream("zipFileName");
-	//		File imageFile = new File("imageFileName");
-	//		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-	//		builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-	//		builder.addBinaryBody
-	//				("upfile", imageFile, ContentType.DEFAULT_BINARY, "imageFileName");
-	//		builder.addBinaryBody
-	//				("upstream", inputStream, ContentType.create("application/zip"), "zipFileName");
-	//		builder.addTextBody("text", "This is a multipart post", ContentType.TEXT_PLAIN);
-	//		//
-	//		HttpEntity entity = builder.build();
-	//		post.setEntity(entity);
-	//		HttpResponse response = client.execute(post);
-	//	}
-
-	//	public void deleteLater() throws GeneralSecurityException, IOException {
-	//
-	//		GoogleCredentials googleCredentials = GoogleCredentials
-	//				.fromStream(new FileInputStream(CREDENTIALS_FILE_NAME))
-	//				.createScoped(Collections.singletonList(OAUTH_SCOPE_GOOGLE_DRIVE));
-	//
-	//		Drive driveService = new Drive
-	//				.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), new HttpCredentialsAdapter(googleCredentials))
-	//				.setApplicationName(APPLICATION_NAME)
-	//				.build();
-	//
-	//		// Print the names and IDs for up to 10 files.
-	//		FileList result = driveService.files().list()
-	//				.setPageSize(10)
-	//				.setFields("nextPageToken, files(id, name)")
-	//				.execute();
-	//
-	//		log.info("Id of the shared drive to search: {}", driveService.files().list().getDriveId());
-	//
-	//		About about = driveService.about().get().setFields("*").execute();
-	//		System.out.println("Drive user: " + about.getUser().getEmailAddress());
-	//		System.out.println("getStorageQuota (Bytes): " + about.getStorageQuota());
-	//		System.out.println("getKind: " + about.getKind());
-	//
-	//		List<File> files = result.getFiles();
-	//		if (files == null || files.isEmpty()) {
-	//			System.out.println("No files found");
-	//		} else {
-	//			System.out.println("Files:");
-	//			for (File file : files) {
-	//				System.out.printf("%s (%s)\n", file.getName(), file.getId());
-	//			}
-	//		}
-	//	}
 
 }

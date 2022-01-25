@@ -24,11 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NotionBackup {
 
-	// TODO add another github action: build the docker container, push it to my repo and then run
-	// TODO add those actions to gists
-	// TODO add Nextcloud upload- https://docs.nextcloud.com/server/latest/developer_manual/client_apis/WebDAV/basic.html#uploading-files
-	// TODO add tests, mockito
-
 	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
 
 	public static final String KEY_NEXTCLOUD_EMAIL = "NEXTCLOUD_EMAIL";

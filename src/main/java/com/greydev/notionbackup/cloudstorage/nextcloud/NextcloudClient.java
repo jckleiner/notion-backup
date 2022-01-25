@@ -31,12 +31,6 @@ public class NextcloudClient implements CloudStorageClient {
 	}
 
 
-	/**
-	 * Uploads a given file to the users Nextcloud instance.
-	 *
-	 * @param fileToUpload file to upload
-	 * @return true if the upload was successful, false otherwise.
-	 */
 	@Override
 	public boolean upload(File fileToUpload) {
 		log.info("Nextcloud: uploading file '{}' ...", fileToUpload.getName());
@@ -45,14 +39,14 @@ public class NextcloudClient implements CloudStorageClient {
 			HttpResponse<String> response = uploadFileToNextcloud(fileToUpload);
 
 			if (response.statusCode() == 201) {
-				log.info("File '{}' was successfully uploaded to Nextcloud", fileToUpload.getName());
+				log.info("Nextcloud: successfully uploaded '{}'", fileToUpload.getName());
 			} else if (response.statusCode() == 204) {
-				log.info("Nextcloud file upload response code is {}). " +
+				log.info("Nextcloud: file upload response code is {}). " +
 						"This probably means a file with the same name already exists and it was overwritten/replaced.", response.statusCode());
 			} else if (response.statusCode() == 404) {
-				log.info("Nextcloud file upload response code is {}. The path you provided was not found.", response.statusCode());
+				log.info("Nextcloud: file upload response code is {}. The path you provided was not found.", response.statusCode());
 			} else {
-				log.info("Unknown Nextcloud response code: '{}'", response.statusCode());
+				log.info("Nextcloud: Unknown Nextcloud response code: '{}'", response.statusCode());
 			}
 
 		} catch (IOException | InterruptedException e) {
@@ -84,16 +78,6 @@ public class NextcloudClient implements CloudStorageClient {
 		// Return code is 201 when the file was successfully uploaded
 		// Return code is 204 when the file already exists (file will be overwritten/replaced)
 		return client.send(request, HttpResponse.BodyHandlers.ofString());
-	}
-
-
-	@Override
-	public boolean doesFileExist(String fileName) {
-		// ListFolderResult result = dropboxService.files().listFolder("");
-		// return result.getEntries().stream()
-		// 		.anyMatch(entry -> StringUtils.equalsIgnoreCase(entry.getName(), fileName));
-		// TODO
-		return false;
 	}
 
 }

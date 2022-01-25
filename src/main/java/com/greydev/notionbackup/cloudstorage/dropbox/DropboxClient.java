@@ -32,13 +32,6 @@ public class DropboxClient implements CloudStorageClient {
 	}
 
 
-	/**
-	 * Uploads a given file to the users Dropbox instance.
-	 *
-	 * @param fileToUpload file to upload
-	 * @return true if the upload was successful, false otherwise.
-	 */
-	// You should always annotate methods with @Override if it's available, also interface methods
 	@Override
 	public boolean upload(File fileToUpload) {
 		log.info("Dropbox: uploading file '{}' ...", fileToUpload.getName());
@@ -61,7 +54,6 @@ public class DropboxClient implements CloudStorageClient {
 	}
 
 
-	@Override // You should always annotate methods with @Override if it's available, also interface methods
 	public boolean doesFileExist(String fileName) throws DbxException {
 		ListFolderResult result = dropboxService.files().listFolder("");
 		return result.getEntries().stream()

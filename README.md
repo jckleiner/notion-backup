@@ -2,10 +2,6 @@
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-docker-workflow/badge.svg?branch=master)
 
-### Warning: this repo is far from done, it's still work-in-progress!
-
-see also https://github.com/openownership/notion-backup
-
 ### Set Credentials
 
 Create a `.env` file with the following properties ([How do I find all these values?](./documentation/setup.md)):
@@ -17,12 +13,13 @@ Create a `.env` file with the following properties ([How do I find all these val
     NOTION_EMAIL=
     NOTION_PASSWORD=
 
-    # Default is markdown.
+    # Options: markdown, html, csv. Default is markdown.
     NOTION_EXPORT_TYPE=markdown
 
     # Google (Optional)
     GOOGLE_DRIVE_ROOT_FOLDER_ID=
     GOOGLE_DRIVE_SERVICE_ACCOUNT=
+    # Provide either secret json or the path to the secret file
     GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=
     GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=
 
@@ -45,9 +42,8 @@ docker run \
     jckleiner/notion-backup
 ```
 
-The downloaded Notion export file will be saved to the `/downloads` folder in the Docker container and the container 
-will be removed
-after the backup is done (because of the `--rm=true` flag).
+The downloaded Notion export file will be saved to the `/downloads` folder in the Docker container and the container
+will be removed after the backup is done (because of the `--rm=true` flag).
 
 ### Local Backup with Docker
 
@@ -80,8 +76,3 @@ Another way to do automated backups is using GitHub Actions. You can simply:
 
 If you get the exception: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try to
 re-generate your access token and run the application again.
-
-## TODO:
-
-1. Create gifs for readme, update readme, document also how github actions work in this project
-2. Upload files to a Git Repo
