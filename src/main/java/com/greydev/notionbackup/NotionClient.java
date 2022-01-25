@@ -9,6 +9,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -154,6 +155,7 @@ public class NotionClient {
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(LOGIN_ENDPOINT))
 				.POST(HttpRequest.BodyPublishers.ofString(credentialsJson))
+				.timeout(Duration.ofSeconds(10))
 				.header("Content-Type", "application/json")
 				.build();
 
@@ -197,6 +199,7 @@ public class NotionClient {
 				.uri(URI.create(GET_TASKS_ENDPOINT))
 				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
 				.header("Content-Type", "application/json")
+				.timeout(Duration.ofSeconds(10))
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
