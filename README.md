@@ -14,8 +14,7 @@ Create a `.env` file with the following properties ([How do I find all these val
     NOTION_SPACE_ID=
     NOTION_EMAIL=
     NOTION_PASSWORD=
-
-    # Options: markdown, html (Default is markdown)
+    # Options: markdown, html (default is markdown)
     NOTION_EXPORT_TYPE=markdown
 
     # Google (Optional)
@@ -75,6 +74,8 @@ Another way to do automated backups is using GitHub Actions. You can simply:
    the [necessary environment variables](#set-credentials).
 3. You can adjust when the action will be triggered by editing your `notion-backup/.github/workflows/docker.yml`
    workflow file.
+
+That's it. GitHub Actions will now run your workflow regularly at your defined time interval.
 
 ## Troubleshoot
 
