@@ -2,13 +2,13 @@ name: notion-backup-docker-workflow
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ develop ]
+    branches: [ master ]
 
-  # will be triggered each day at 04:05
+  # will be triggered at 04:05 on every 2nd day-of-month from 2 through 30.
   schedule:
-    - cron: '5 4 * * *'
+    - cron: '5 4 2-30/2 * *'
 
 # See https://github.com/marketplace/actions/docker-run-step
 # See https://github.com/addnab/docker-run-action

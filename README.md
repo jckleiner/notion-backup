@@ -13,7 +13,7 @@ Create a `.env` file with the following properties ([How do I find all these val
     NOTION_EMAIL=
     NOTION_PASSWORD=
 
-    # Options: markdown, html, csv. Default is markdown.
+    # Options: markdown, html (Default is markdown)
     NOTION_EXPORT_TYPE=markdown
 
     # Google (Optional)
