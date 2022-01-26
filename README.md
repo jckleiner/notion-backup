@@ -2,6 +2,8 @@
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-docker-workflow/badge.svg?branch=master)
 
+Automatically backup your Notion workspace to Google Drive, Dropbox, Nextcloud or to your local machine.
+
 ### Set Credentials
 
 Create a `.env` file with the following properties ([How do I find all these values?](./documentation/setup.md)):
@@ -45,6 +47,9 @@ docker run \
 The downloaded Notion export file will be saved to the `/downloads` folder in the Docker container and the container
 will be removed after the backup is done (because of the `--rm=true` flag).
 
+If you want automatic backups in regular intervals, you could either setup a cronjob or [fork this repo](#fork-github-actions) and let
+GitHub Actions do the job.
+
 ### Local Backup with Docker
 
 If you want to keep the downloaded files locally, you could mount the `/downloads` folder from the container somewhere
@@ -58,7 +63,8 @@ docker run \
     jckleiner/notion-backup
 ```
 
-You could also set a cronjob if you want trigger backups in regular intervals.
+If you want automatic backups in regular intervals, you could either setup a cronjob or [fork this repo](#fork-github-actions) and let 
+GitHub Actions do the job.
 
 ### Fork (GitHub Actions)
 
