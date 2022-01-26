@@ -8,18 +8,30 @@
 
 ![testImage](../images/notion-search-request.png)
 
-
 ### Dropbox
 
-TODO: GIF
-
 1. Create a new app on developer console (https://www.dropbox.com/developers/apps/create)
-2. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your
-   changes. Make sure you saved these changes **before** you generate your access token
+2. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your changes.
+   Make sure you saved these changes **before** you generate your access token
 3. Go to Settings > OAuth 2 > Generate access token > generate > Access token expiration: "no expiration" and copy the
    generated token
 
 > Long-lived tokens are less secure and will be deprecated in the future.
+
+### Nextcloud
+
+All you need is to provide your Email, password and the WebDAV URL.
+
+On your main Nextcloud page, click Settings at the bottom left. This should show you a WebDAV URL
+like `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/path/to/directory/`
+
+* If the WebDAV URL ends with a `/`, for instance `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/Documents/`: this
+  indicates the uploaded file will be placed in the `Documents` folder.
+* If the WebDAV URL **does not end** with a `/`, for
+  instance `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/Documents/somefile.txt`: this indicates the uploaded
+  file will be named `somefile.txt` and it will be placed in the `Documents` folder. If a file with the same name 
+  exists, it will be overwritten.
+* All the folders must be present
 
 ### Google Drive
 
@@ -41,5 +53,5 @@ TODO: GIF
     backups to be saved in. You need to share that folder with the service account you've just created. Right click on
     the folder -> Share -> enter the E-Mail address of your service account. (Your service account's address probably
     looks like XXX@XXX.iam.gserviceaccount.com)
-14. TODO - Copy the id of that folder, from the URL
-15. You are now ready to setup the application. Go to TODO - link to setup...
+14. **TODO** - Copy the id of that folder, from the URL
+15. **TODO** You are now ready to setup the application. Go to TODO - link to setup...
