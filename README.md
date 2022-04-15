@@ -22,7 +22,7 @@ Create a `.env` file with the following properties ([How do I find all these val
     GOOGLE_DRIVE_SERVICE_ACCOUNT=
     # Provide either secret json or the path to the secret file
     GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=
-    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=
+    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=credentials.json
 
     # Dropbox (Optional)
     DROPBOX_ACCESS_TOKEN=

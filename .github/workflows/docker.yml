@@ -10,6 +10,8 @@ on:
   schedule:
     - cron: '5 4 2-30/2 * *'
 
+  workflow_dispatch:
+
 # See https://github.com/marketplace/actions/docker-run-step
 # See https://github.com/addnab/docker-run-action
 

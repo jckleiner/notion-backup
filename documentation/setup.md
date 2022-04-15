@@ -35,6 +35,8 @@ like `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/path/to/directory/`
 
 ### Google Drive
 
+> This is a pretty tedious task. If someone knows a better way to do this, please let me know.
+
 1. Login to your [google developer console](https://console.developers.google.com/)
 2. Open [cloud-resource-manager](https://console.cloud.google.com/cloud-resource-manager) and create a project.
 3. Go to the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) page
@@ -48,10 +50,16 @@ like `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/path/to/directory/`
    account.
 10. Copy the E-Mail address of your service account since you will need it later.
 11. Keys -> Add Key -> Create new key -> JSON and download that file
-12. Rename the downloaded file to `credentials.json` and move it to the project root directory.
+12. Rename the downloaded file to `credentials.json` and move it to the project root directory. The path to this 
+    file is the value for your `GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH` environment variable.
+    Alternatively, if you don't want to keep a `credentials.json` file, you could copy the contents of 
+    `credentials.json` file and provide it as a value to your `GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON` environment variable.
 13. Login to your [Google Drive account](https://drive.google.com/drive/) and select the folder you want your notion
     backups to be saved in. You need to share that folder with the service account you've just created. Right click on
-    the folder -> Share -> enter the E-Mail address of your service account. (Your service account's address probably
-    looks like XXX@XXX.iam.gserviceaccount.com)
-14. **TODO** - Copy the id of that folder, from the URL
-15. **TODO** You are now ready to setup the application. Go to TODO - link to setup...
+    the folder -> Share -> enter the E-Mail address of your service account. (The email of your service account will 
+    probably look something like `XXX@XXX.iam.gserviceaccount.com`. This is the value for your 
+    `GOOGLE_DRIVE_SERVICE_ACCOUNT` environment variable.)
+14. Open that folder by double-clicking on it. You will now be able to see the id of that folder in the URL. It 
+    should look something like `https://drive.google.com/drive/folders/62F2faJbVasSGsYGyQzBeGSc2-k7GOZg2`. The ID 
+    (only the last part `62F2faJbVasSGsYGyQzBeGSc2-k7GOZg2` of the URL) is the value for 
+    your `GOOGLE_DRIVE_ROOT_FOLDER_ID` environment variable.
