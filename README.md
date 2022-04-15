@@ -32,7 +32,7 @@ Create a `.env` file with the following properties ([How do I find all these val
     NEXTCLOUD_PASSWORD=
     NEXTCLOUD_WEBDAV_URL=
 
-### Backup to Cloud with Docker
+### Backup to Cloud With Docker
 
 Once you created your `.env` file, you can run the following command to start your backup:
 
@@ -49,7 +49,7 @@ will be removed after the backup is done (because of the `--rm=true` flag).
 If you want automatic backups in regular intervals, you could either setup a cronjob or [fork this repo](#fork-github-actions) and let
 GitHub Actions do the job.
 
-### Local Backup with Docker
+### Local Backup With Docker
 
 If you want to keep the downloaded files locally, you could mount the `/downloads` folder from the container somewhere
 on your machine:
@@ -77,9 +77,9 @@ Another way to do automated backups is using GitHub Actions. You can simply:
 
 That's it. GitHub Actions will now run your workflow regularly at your defined time interval.
 
-## Troubleshoot
+## Troubleshooting
 
 ### Dropbox
 
 If you get the exception: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try to
-re-generate your access token and run the application again.
+re-generate your Dropbox access token and run the application again.
