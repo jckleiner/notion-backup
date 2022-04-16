@@ -1,0 +1,62 @@
+// In progress
+{
+  "results": [
+    {
+      "id": "<id>",
+      "eventName": "exportSpace",
+      "request": {
+        "spaceId": "<workspace-id>",
+        "exportOptions": {
+          "exportType": "markdown",
+          "timeZone": "Europe/Berlin",
+          "locale": "en"
+        }
+      },
+      "actor": {
+        "table": "notion_user",
+        "id": "<id>"
+      },
+      "state": "in_progress",
+      "rootRequest": {
+        "eventName": "exportSpace",
+        "requestId": "<request-id>"
+      },
+      "status": {
+        "type": "progress",
+        "pagesExported": 3
+      }
+    }
+  ]
+}
+
+// Success
+{
+  "results": [
+    {
+      "id": "<id>",
+      "eventName": "exportSpace",
+      "request": {
+        "spaceId": "<workspace-id>",
+        "exportOptions": {
+          "exportType": "markdown",
+          "timeZone": "Europe/Berlin",
+          "locale": "en"
+        }
+      },
+      "actor": {
+        "table": "notion_user",
+        "id": "<id>"
+      },
+      "state": "success",
+      "rootRequest": {
+        "eventName": "exportSpace",
+        "requestId": "<id>"
+      },
+      "status": {
+        "type": "complete",
+        "pagesExported": 25,
+        "exportURL": "<download-url>"
+      }
+    }
+  ]
+}
