@@ -41,6 +41,8 @@ public class NotionBackup {
 	}
 
 	public static void main(String[] args) {
+		log.info("---------------- Starting Notion Backup ----------------");
+
 		NotionClient notionClient = new NotionClient(dotenv);
 
 		final File exportedFile = notionClient.export()
