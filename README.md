@@ -17,12 +17,12 @@ Create a `.env` file with the following properties ([How do I find all these val
     # Options: markdown, html (default is markdown)
     NOTION_EXPORT_TYPE=markdown
 
-    # Google (Optional)
+    # Google Drive (Optional)
     GOOGLE_DRIVE_ROOT_FOLDER_ID=
     GOOGLE_DRIVE_SERVICE_ACCOUNT=
     # Provide either secret json or the path to the secret file
     GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=
-    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=credentials.json
+    GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=
 
     # Dropbox (Optional)
     DROPBOX_ACCESS_TOKEN=
@@ -46,7 +46,7 @@ docker run \
 The downloaded Notion export file will be saved to the `/downloads` folder in the Docker container and the container
 will be removed after the backup is done (because of the `--rm=true` flag).
 
-If you want automatic backups in regular intervals, you could either setup a cronjob or [fork this repo](#fork-github-actions) and let
+If you want automatic backups in regular intervals, you could either set up a cronjob or [fork this repo](#fork-github-actions) and let
 GitHub Actions do the job.
 
 ### Local Backup With Docker
@@ -62,7 +62,7 @@ docker run \
     jckleiner/notion-backup
 ```
 
-If you want automatic backups in regular intervals, you could either setup a cronjob or [fork this repo](#fork-github-actions) and let 
+If you want automatic backups in regular intervals, you could either set up a cronjob or [fork this repo](#fork-github-actions) and let 
 GitHub Actions do the job.
 
 ### Fork (GitHub Actions)
