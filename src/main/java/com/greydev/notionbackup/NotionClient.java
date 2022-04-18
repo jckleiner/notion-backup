@@ -35,17 +35,20 @@ public class NotionClient {
 	private static final String EXPORT_FILE_NAME = "notion-export";
 	private static final String EXPORT_FILE_EXTENSION = ".zip";
 
+	private static final String KEY_DOWNLOADS_DIRECTORY_PATH = "DOWNLOADS_DIRECTORY_PATH";
 	private static final String KEY_NOTION_SPACE_ID = "NOTION_SPACE_ID";
 	private static final String KEY_NOTION_EMAIL = "NOTION_EMAIL";
 	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
 	private static final String KEY_NOTION_EXPORT_TYPE = "NOTION_EXPORT_TYPE";
 	private static final String DEFAULT_NOTION_EXPORT_TYPE = "markdown";
-	private static final String DOWNLOADS_DIR = "/downloads";
+	private static final String DEFAULT_DOWNLOADS_PATH = "/downloads";
+
 
 	private final String notionSpaceId;
 	private final String notionEmail;
 	private final String notionPassword;
 	private final String exportType;
+	private String downloadsDirectoryPath;
 
 	private final HttpClient newClient;
 	private final CookieManager cookieManager;
@@ -61,6 +64,15 @@ public class NotionClient {
 		notionSpaceId = dotenv.get(KEY_NOTION_SPACE_ID);
 		notionEmail = dotenv.get(KEY_NOTION_EMAIL);
 		notionPassword = dotenv.get(KEY_NOTION_PASSWORD);
+		downloadsDirectoryPath = dotenv.get(KEY_DOWNLOADS_DIRECTORY_PATH);
+
+		if (StringUtils.isBlank(downloadsDirectoryPath)) {
+			log.info("{} is not set. Downloads will be saved to: {} ", KEY_DOWNLOADS_DIRECTORY_PATH, DEFAULT_DOWNLOADS_PATH);
+			downloadsDirectoryPath = DEFAULT_DOWNLOADS_PATH;
+		} else {
+			log.info("Downloads will be saved to: {} ", downloadsDirectoryPath);
+		}
+
 		exportType = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_EXPORT_TYPE)) ? dotenv.get(KEY_NOTION_EXPORT_TYPE) : DEFAULT_NOTION_EXPORT_TYPE;
 
 		exitIfRequiredEnvVariablesNotValid();
@@ -108,9 +120,9 @@ public class NotionClient {
 					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")),
 					EXPORT_FILE_EXTENSION);
 
-			log.info("DOWNLOADS_DIR: " + DOWNLOADS_DIR);
+			log.info("Downloaded export will be saved to: " + downloadsDirectoryPath);
 			log.info("fileName: " + fileName);
-			Path downloadPath = Path.of(DOWNLOADS_DIR, fileName);
+			Path downloadPath = Path.of(downloadsDirectoryPath, fileName);
 			Optional<File> downloadedFile = downloadToFile(downloadLink.get(), downloadPath);
 
 			if (downloadedFile.isEmpty() || !downloadedFile.get().isFile()) {

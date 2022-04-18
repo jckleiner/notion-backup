@@ -1,6 +1,6 @@
 # notion-backup
 
-![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-docker-workflow/badge.svg?branch=master)
+![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-build-run/badge.svg?branch=master)
 
 Automatically backup your Notion workspace to Google Drive, Dropbox, Nextcloud or to your local machine.
 

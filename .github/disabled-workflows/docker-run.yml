@@ -1,4 +1,4 @@
-name: notion-backup-docker-workflow
+name: notion-backup-docker-run
 
 on:
   push:
@@ -39,6 +39,8 @@ jobs:
             NEXTCLOUD_EMAIL=${{ secrets.NEXTCLOUD_EMAIL }}
             NEXTCLOUD_PASSWORD=${{ secrets.NEXTCLOUD_PASSWORD }}
             NEXTCLOUD_WEBDAV_URL=${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+
+            DOWNLOADS_DIRECTORY_PATH=/tmp/
 
           # run is required: "Error: Input required and not supplied: run"
           run: |

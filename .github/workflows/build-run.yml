@@ -1,40 +1,46 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: notion-backup-workflow
+name: notion-backup-build-run
 
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+
+  # will be triggered at 04:05 on every 2nd day-of-month from 2 through 30.
   schedule:
-    - cron: '5 4 * * *'
+    - cron: '5 4 2-30/2 * *'
 
 jobs:
-  build:
-
+  build-and-run:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up JDK 1.11
       uses: actions/setup-java@v1
       with:
         java-version: 1.11
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+
     - name: Start Notion Backup
       run: java -jar ./target/notion-backup-1.0-SNAPSHOT.jar
       env:
-        NOTION_LOCALE: en
-        NOTION_TIMEZONE: 'Europe/Berlin'
         NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
         NOTION_EMAIL: ${{ secrets.NOTION_EMAIL }}
         NOTION_PASSWORD: ${{ secrets.NOTION_PASSWORD }}
-        
+        NOTION_LOCALE: en
+        NOTION_TIMEZONE: 'Europe/Berlin'
+
         GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
+        GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
         GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
-        #GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH:
+        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH }}
        
         DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+
+        NEXTCLOUD_EMAIL: ${{ secrets.NEXTCLOUD_EMAIL }}
+        NEXTCLOUD_PASSWORD: ${{ secrets.NEXTCLOUD_PASSWORD }}
+        NEXTCLOUD_WEBDAV_URL: ${{ secrets.NEXTCLOUD_WEBDAV_URL }}
