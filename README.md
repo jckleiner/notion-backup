@@ -46,8 +46,8 @@ docker run \
 The downloaded Notion export file will be saved to the `/downloads` folder in the Docker container and the container
 will be removed after the backup is done (because of the `--rm=true` flag).
 
-If you want automatic backups in regular intervals, you could either set up a cronjob or [fork this repo](#fork-github-actions) and let
-GitHub Actions do the job.
+If you want automatic backups in regular intervals, you could either set up a cronjob on your local machine or
+[fork this repo](#fork-github-actions) and let GitHub Actions do the job.
 
 ### Local Backup With Docker
 
@@ -62,18 +62,22 @@ docker run \
     jckleiner/notion-backup
 ```
 
-If you want automatic backups in regular intervals, you could either set up a cronjob or [fork this repo](#fork-github-actions) and let 
-GitHub Actions do the job.
+If you want automatic backups in regular intervals, you could either set up a cronjob on your local machine or 
+[fork this repo](#fork-github-actions) and let GitHub Actions do the job.
 
 ### Fork (GitHub Actions)
 
 Another way to do automated backups is using GitHub Actions. You can simply:
 
 1. Fork this repository.
-2. Create repository secrets: Go to `notion-backup > Settings > Secrets > Actions` and create all
+2. Create repository secrets: Go to `notion-backup (your forked repo) > Settings > Secrets > Actions` and create all
    the [necessary environment variables](#set-credentials).
-3. You can adjust when the action will be triggered by editing your `notion-backup/.github/workflows/docker.yml`
-   workflow file.
+3. Go to `notion-backup (your forked repo) > Actions` to see the workflows and make sure the 
+   `notion-backup-build-run` workflow is enabled. This is the workflow which will periodically build and run the 
+   application.
+4. You can adjust when the action will be triggered by editing the `schedule > cron` property in your 
+   [notion-backup/.github/workflows/build-run.yml](.github/workflows/build-run.yml)
+   workflow file (to convert time values into cron expressions: [crontab.guru](https://crontab.guru/)).
 
 That's it. GitHub Actions will now run your workflow regularly at your defined time interval.
 
