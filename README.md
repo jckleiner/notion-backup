@@ -81,6 +81,26 @@ Another way to do automated backups is using GitHub Actions. You can simply:
 
 That's it. GitHub Actions will now run your workflow regularly at your defined time interval.
 
+## Local Development
+
+Testing Nextcloud file upload from the command-line:
+
+```
+# <user> user name in nextcloud
+# <pass> password <user>
+# <nextcloud root> root folder of nextcloud ex) https://abc.com/nextcloud
+# <path of file to download> Path of nextcloud which you want to download
+# <path to save> Path of your system which you want to download to
+# If the WebDAV URL ends with a `/`, for instance `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/Documents/`: this
+  indicates the uploaded file will be placed in the `Documents` folder.
+# If the WebDAV URL **does not end** with a `/`, for
+  instance `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/Documents/somefile.txt`: this indicates the uploaded
+  file will be named `somefile.txt` and it will be placed in the `Documents` folder. If a file with the same name 
+  exists, it will be overwritten.
+  
+curl --user 'USERNAME':'PASSWORD' --upload-file /path/to/file https://my.nextcloud.tld/remote.php/dav/files/USERNAME/path/to/directory/
+```
+
 ## Troubleshooting
 
 ### Dropbox
