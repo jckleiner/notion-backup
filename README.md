@@ -2,6 +2,9 @@
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-build-run/badge.svg?branch=master)
 
+> **Notion changed their API on 27.05.2022:** it is no longer possible to fetch the tokenV2 by sending a login request and that's why the build is not working anymore. 
+> I will try to find another way to fetch the token
+
 Automatically backup your Notion workspace to Google Drive, Dropbox, Nextcloud or to your local machine.
 
 ### Set Credentials
