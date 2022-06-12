@@ -28,7 +28,6 @@ import static org.mockito.Mockito.*;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 public class DropboxClientTest {
-	// TODO use beforeEach or a similar construct to aggregate common logic
 
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS)
 	private DbxClientV2 dropboxService;
@@ -44,7 +43,6 @@ public class DropboxClientTest {
 		if (!testFileToUpload.exists()) {
 			System.out.println("Test file does not exist...");
 		}
-		// TODO what to return here?
 		when(dropboxService.files().uploadBuilder(anyString()).uploadAndFinish(any())).thenReturn(null);
 		doReturn(true).when(testee).doesFileExist(anyString());
 
@@ -52,7 +50,6 @@ public class DropboxClientTest {
 		boolean result = testee.upload(testFileToUpload);
 
 		// then
-		// TODO verify each method call in call chain?
 		verify(dropboxService.files().uploadBuilder("/testFileToUpload.txt")).uploadAndFinish(any(FileInputStream.class));
 		verify(testee).doesFileExist("testFileToUpload.txt");
 		assertTrue(result);
@@ -153,7 +150,7 @@ public class DropboxClientTest {
 		ListFolderResult listFolderResult = new ListFolderResult(metadataList, "2", true);
 
 		when(dropboxService.files().listFolder(anyString())).thenReturn(listFolderResult);
-		clearInvocations(dropboxService); // TODO wut?
+		clearInvocations(dropboxService);
 
 		// when
 		boolean result = testee.doesFileExist("testFileToUpload.txt");
