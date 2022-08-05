@@ -43,7 +43,7 @@ docker run \
     jckleiner/notion-backup
 ```
 
-The downloaded Notion export file will be saved to the `/downloads` folder *within the Docker container* and the container
+The downloaded Notion export file will be saved to the `/downloads` folder **within the Docker container** and the container
 will be removed after the backup is done (because of the `--rm=true` flag).
 
 If you want automatic backups in regular intervals, you could either set up a cronjob on your local machine or
