@@ -215,7 +215,7 @@ public class NotionClient {
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 800; i++) {
 			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
@@ -243,7 +243,7 @@ public class NotionClient {
 			sleep(6000);
 		}
 
-		log.info("Notion workspace export failed. After 10 minutes, the export status from the Notion API response was still not 'success'");
+		log.info("Notion workspace export failed. After waiting 80 minutes, the export status from the Notion API response was still not 'success'");
 		return Optional.empty();
 	}
 
