@@ -40,7 +40,9 @@ public class NotionClient {
 	private static final String KEY_NOTION_EMAIL = "NOTION_EMAIL";
 	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
 	private static final String KEY_NOTION_EXPORT_TYPE = "NOTION_EXPORT_TYPE";
+	private static final String KEY_NOTION_FLATTEN_EXPORT_FILETREE = "NOTION_FLATTEN_EXPORT_FILETREE";
 	private static final String DEFAULT_NOTION_EXPORT_TYPE = "markdown";
+	private static final boolean DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE = false;
 	private static final String DEFAULT_DOWNLOADS_PATH = "/downloads";
 
 
@@ -48,6 +50,7 @@ public class NotionClient {
 	private final String notionEmail;
 	private final String notionPassword;
 	private final String exportType;
+	private final boolean flattenExportFiletree;
 	private String downloadsDirectoryPath;
 
 	private final HttpClient newClient;
@@ -74,10 +77,14 @@ public class NotionClient {
 		}
 
 		exportType = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_EXPORT_TYPE)) ? dotenv.get(KEY_NOTION_EXPORT_TYPE) : DEFAULT_NOTION_EXPORT_TYPE;
+		flattenExportFiletree = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_FLATTEN_EXPORT_FILETREE)) ?
+				Boolean.parseBoolean(dotenv.get(KEY_NOTION_FLATTEN_EXPORT_FILETREE)) :
+				DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE;
 
 		exitIfRequiredEnvVariablesNotValid();
 
 		log.info("Using export type: {}", exportType);
+		log.info("Flatten export file tree: {}", flattenExportFiletree);
 	}
 
 
@@ -114,9 +121,10 @@ public class NotionClient {
 			log.info("Download link extracted");
 
 			log.info("Downloading file...");
-			String fileName = String.format("%s-%s_%s%s",
+			String fileName = String.format("%s-%s%s_%s%s",
 					EXPORT_FILE_NAME,
 					exportType,
+					flattenExportFiletree ? "-flattened" : "",
 					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")),
 					EXPORT_FILE_EXTENSION);
 
@@ -256,13 +264,14 @@ public class NotionClient {
 				"      \"spaceId\": \"%s\"," +
 				"      \"exportOptions\": {" +
 				"        \"exportType\": \"%s\"," +
+				"        \"flattenExportFiletree\": %s," +
 				"        \"timeZone\": \"Europe/Berlin\"," +
 				"        \"locale\": \"en\"" +
 				"      }" +
 				"    }" +
 				"  }" +
 				"}";
-		return String.format(taskJsonTemplate, notionSpaceId, exportType);
+		return String.format(taskJsonTemplate, notionSpaceId, exportType, flattenExportFiletree);
 	}
 
 

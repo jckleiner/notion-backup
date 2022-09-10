@@ -8,6 +8,7 @@
         "spaceId": "<workspace-id>",
         "exportOptions": {
           "exportType": "markdown",
+          "flattenExportFiletree": false,
           "timeZone": "Europe/Berlin",
           "locale": "en"
         }
@@ -39,6 +40,7 @@
         "spaceId": "<workspace-id>",
         "exportOptions": {
           "exportType": "markdown",
+          "flattenExportFiletree": false,
           "timeZone": "Europe/Berlin",
           "locale": "en"
         }
