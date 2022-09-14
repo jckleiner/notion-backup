@@ -112,8 +112,8 @@ public class NotionBackup {
 			String dropboxAppKey = dotenv.get(KEY_DROPBOX_APP_KEY);
 			String dropboxAppSecret = dotenv.get(KEY_DROPBOX_APP_SECRET);
 			String dropboxRefreshToken = dotenv.get(KEY_DROPBOX_REFRESH_TOKEN);
-			if (StringUtils.isBlank(dropboxAppKey) || StringUtils.isBlank(dropboxAppSecret) || StringUtils.isBlank(dropboxRefreshToken)) {
-				log.info("Failed to fetch an access token. Either {} or {} or {} is blank.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
+			if (StringUtils.isAnyBlank(dropboxAppKey, dropboxAppSecret, dropboxRefreshToken)) {
+				log.info("Failed to fetch an access token. Either {}, {} or {} is blank.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
 				return Optional.empty();
 			}
 
