@@ -88,6 +88,22 @@ public class NotionBackup {
 
 
 	public static void startDropboxBackup(File fileToUpload) {
+		Optional<String> dropboxAccessToken = getDropboxAccessToken();
+		if (dropboxAccessToken.isEmpty()) {
+			log.info("No Dropbox access token available. Skipping Dropbox upload.");
+			return;
+		}
+
+		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken.get());
+		if (dropboxServiceOptional.isEmpty()) {
+			log.warn("Could not create Dropbox service. Skipping Dropbox upload");
+			return;
+		}
+		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
+		dropboxClient.upload(fileToUpload);
+	}
+
+	private static Optional<String> getDropboxAccessToken() {
 		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
 
 		if (StringUtils.isBlank(dropboxAccessToken)) {
@@ -97,8 +113,8 @@ public class NotionBackup {
 			String dropboxAppSecret = dotenv.get(KEY_DROPBOX_APP_SECRET);
 			String dropboxRefreshToken = dotenv.get(KEY_DROPBOX_REFRESH_TOKEN);
 			if (StringUtils.isBlank(dropboxAppKey) || StringUtils.isBlank(dropboxAppSecret) || StringUtils.isBlank(dropboxRefreshToken)) {
-				log.info("Failed to fetch an access token. Either {} or {} or {} is blank. Skipping Dropbox upload.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
-				return;
+				log.info("Failed to fetch an access token. Either {} or {} or {} is blank.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
+				return Optional.empty();
 			}
 
 			DbxCredential dbxCredential = new DbxCredential("", 14400L, dropboxRefreshToken, dropboxAppKey, dropboxAppSecret);
@@ -106,21 +122,15 @@ public class NotionBackup {
 			try {
 				refreshResult = dbxCredential.refresh(new DbxRequestConfig("NotionBackup"));
 			} catch (DbxException e) {
-				log.info("Token refresh call to Dropbox API failed. Skipping Dropbox upload.");
-				return;
+				log.info("Token refresh call to Dropbox API failed.");
+				return Optional.empty();
 			}
 
 			dropboxAccessToken = refreshResult.getAccessToken();
 			log.info("Successfully fetched an access token.");
 		}
 
-		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken);
-		if (dropboxServiceOptional.isEmpty()) {
-			log.warn("Could not create Dropbox service. Skipping Dropbox upload");
-			return;
-		}
-		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
-		dropboxClient.upload(fileToUpload);
+		return Optional.of(dropboxAccessToken);
 	}
 
 
