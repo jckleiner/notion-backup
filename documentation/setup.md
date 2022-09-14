@@ -11,12 +11,51 @@
 ### Dropbox
 
 1. Create a new app on developer console (https://www.dropbox.com/developers/apps/create)
-2. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your changes.
-   Make sure you saved these changes **before** you generate your access token
-3. Go to Settings > OAuth 2 > Generate access token > generate > Access token expiration: "no expiration" and copy the
-   generated token
+2. Go to the Permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your changes.
+Make sure you saved these changes **before** you generate your access token.
+3. Go to the Settings tab > OAuth 2 > Generate access token > Generate. Note that these tokens are short-lived and expire after a few hours.
+   Due to security reason long-lived tokens have been deprecated.
+   
+For an automated setup, for example with [GitHub Action](../README.md#fork-github-actions), short-lived access tokens will not work because they will expire.
+An alternative solution would be to use a refresh token that does not expire which you need to retrieve manually once.
+The refresh token will then be used to fetch an access token on-the-fly everytime the application runs.
+Do the following steps to set up the refresh token flow.
 
-> Long-lived tokens are less secure and will be deprecated in the future.
+1. Go to the Settings tab and store the App Key in the `DROPBOX_APP_KEY` environment variable
+2. Go to the Settings tab and store the App Secret in the `DROPBOX_APP_SECRET` environment variable
+3. Open a browser and enter the following URL and replace the `<APP_KEY>` placeholder
+
+        https://www.dropbox.com/oauth2/authorize?client_id=<APP_KEY>&token_access_type=offline&response_type=code
+
+4. Click on continue and allow the app to access your files
+5. Copy the authorization code (referred to as `AUTH_CODE` in the following steps) shown in the following screen
+6. Send the following HTTP POST request with the actual values replacing the placeholders
+
+```
+curl --request POST \
+  --url https://api.dropboxapi.com/oauth2/token \
+  --header 'Authorization: Basic <BASE64 ENCODING OF <APP_KEY>:<APP_SECRET>>' \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data code=<AUTH_CODE> \
+  --data grant_type=authorization_code
+```
+
+7. Extract the `refresh_token` from the response and store it in the `DROPBOX_REFRESH_TOKEN` environment variable.
+   **DO NOT SHARE THIS TOKEN WITH ANYONE!**
+
+8. To ensure it works try sending the following HTTP POST request with the actual values replacing the placeholders
+
+```
+curl --request POST \
+  --url https://api.dropbox.com/oauth2/token \
+  --header 'Authorization: Basic <BASE64 ENCODING OF <APP_KEY>:<APP_SECRET>>' \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data grant_type=refresh_token \
+  --data refresh_token=<REFRESH_TOKEN>
+```
+
+9. Leave the `DROPBOX_ACCESS_TOKEN` environment variable empty.
+   Otherwise, the refresh token flow will be skipped and no new access token will be fetched.
 
 ### Nextcloud
 
