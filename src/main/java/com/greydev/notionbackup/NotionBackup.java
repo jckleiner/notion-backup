@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import com.greydev.notionbackup.cloudstorage.pcloud.PCloudApiClientFactory;
+import com.greydev.notionbackup.cloudstorage.pcloud.PCloudClient;
+import com.pcloud.sdk.ApiClient;
+import com.pcloud.sdk.RemoteFolder;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +38,10 @@ public class NotionBackup {
 	private static final String KEY_GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON = "GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON";
 	private static final String KEY_GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH = "GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH";
 
+	private static final String KEY_PCLOUD_ACCESS_TOKEN = "PCLOUD_ACCESS_TOKEN";
+	private static final String KEY_PCLOUD_API_HOST = "PCLOUD_API_HOST";
+	private static final String KEY_PCLOUD_FOLDER_ID = "PCLOUD_FOLDER_ID";
+
 	private static final Dotenv dotenv;
 
 	static {
@@ -54,8 +62,9 @@ public class NotionBackup {
 		CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
 		CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
 		CompletableFuture<Void> futureNextcloud = CompletableFuture.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile));
+		CompletableFuture<Void> futurePCloud = CompletableFuture.runAsync(() -> NotionBackup.startPCloudBackup(exportedFile));
 
-		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud).join();
+		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud, futurePCloud).join();
 	}
 
 
@@ -110,6 +119,34 @@ public class NotionBackup {
 		new NextcloudClient(email, password, webdavUrl).upload(fileToUpload);
 	}
 
+	public static void startPCloudBackup(File fileToUpload) {
+		String pCloudAccessToken = dotenv.get(KEY_PCLOUD_ACCESS_TOKEN);
+		String pCloudApiHost = dotenv.get(KEY_PCLOUD_API_HOST);
+
+		if (StringUtils.isAnyBlank(pCloudAccessToken, pCloudApiHost)) {
+			log.info("Skipping pCloud upload. {} or {} is blank.", KEY_PCLOUD_ACCESS_TOKEN, KEY_PCLOUD_API_HOST);
+			return;
+		}
+
+		Optional<ApiClient> pCloudApiClient = PCloudApiClientFactory.create(pCloudAccessToken, pCloudApiHost);
+		if (pCloudApiClient.isEmpty()) {
+			log.info("Could not create pCloud API client. Skipping pCloud upload.");
+			return;
+		}
+
+		String pCloudFolderIdString = dotenv.get(KEY_PCLOUD_FOLDER_ID);
+		long pCloudFolderId = RemoteFolder.ROOT_FOLDER_ID;
+		if (StringUtils.isNotBlank(pCloudFolderIdString)) {
+			try {
+				pCloudFolderId = Long.parseLong(pCloudFolderIdString);
+			} catch (NumberFormatException e) {
+				log.warn("The given pCloud folder ID {} is not a valid number. Skipping pCloud upload.", pCloudFolderIdString);
+				return;
+			}
+		}
+		PCloudClient pCloudClient = new PCloudClient(pCloudApiClient.get(), pCloudFolderId);
+		pCloudClient.upload(fileToUpload);
+	}
 
 	private static Optional<String> extractGoogleServiceAccountSecret() {
 		String serviceAccountSecret = dotenv.get(KEY_GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON);

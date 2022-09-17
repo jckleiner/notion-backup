@@ -2,7 +2,7 @@
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-build-run/badge.svg?branch=master)
 
-Automatically backup your Notion workspace to Google Drive, Dropbox, Nextcloud or to your local machine.
+Automatically backup your Notion workspace to Google Drive, Dropbox, pCloud, Nextcloud or to your local machine.
 
 ### Set Credentials
 
@@ -33,6 +33,11 @@ Create a `.env` file with the following properties ([How do I find all these val
     NEXTCLOUD_EMAIL=
     NEXTCLOUD_PASSWORD=
     NEXTCLOUD_WEBDAV_URL=
+
+    # pCloud (Optional)
+    PCLOUD_ACCESS_TOKEN=
+    PCLOUD_API_HOST=
+    PCLOUD_FOLDER_ID=
 
 ### Backup to Cloud With Docker
 
@@ -89,3 +94,11 @@ That's it. GitHub Actions will now run your workflow regularly at your defined t
 
 If you get the exception: `com.dropbox.core.BadResponseException: Bad JSON: expected object value.`, then try to
 re-generate your Dropbox access token and run the application again.
+
+### pCloud
+
+If you get the exception: `com.pcloud.sdk.ApiError: 2094 - Invalid 'access_token' provided.`,
+please also make sure that the `PCLOUD_API_HOST` environment variable is correct. There are currently two API hosts:
+one for Europe (`eapi.pcloud.com`) and one for the rest (`api.pcloud.com`).
+If you still get the error, please try and regenerate the access token as described in the [pCloud section](./documentation/setup.md#pcloud)
+of the documentation.

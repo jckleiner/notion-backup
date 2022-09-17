@@ -63,3 +63,38 @@ like `https://my.nextcloud.tld/remote.php/dav/files/EMAIL/path/to/directory/`
     should look something like `https://drive.google.com/drive/folders/62F2faJbVasSGsYGyQzBeGSc2-k7GOZg2`. The ID 
     (only the last part `62F2faJbVasSGsYGyQzBeGSc2-k7GOZg2` of the URL) is the value for 
     your `GOOGLE_DRIVE_ROOT_FOLDER_ID` environment variable.
+
+### pCloud
+
+1. Go to the [pCloud Developer App Console](https://docs.pcloud.com/my_apps/) and create a new application.
+2. Choose if you want the app to have only access to a specific app folder or your complete cloud and make sure to give it write access.
+3. Open a browser and enter the following URL with `<CLIENT_ID>` replaced by the client ID shown in the developer console.
+
+```
+https://my.pcloud.com/oauth2/authorize?client_id=<CLIENT_ID>&response_type=code
+```
+
+4. Log in to pCloud and allow the app access to your account
+5. Copy the shown hostname into the `PCLOUD_API_HOST` environment variable
+6. Copy the shown access code to some editor for later use (referred to as `ACCESS_CODE`)
+7. Make the following HTTP GET request with the placeholders being replaced by the actual values
+
+```
+curl --request GET \
+  --url 'https://<PCLOUD_API_HOST>/oauth2_token?code=<ACCESS_CODE>&client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>'
+```
+
+8. Copy the `access_token` value from the response into the `PCLOUD_ACCESS_TOKEN` environment variable
+
+If you want to upload files to the root of your app folder/cloud, then you are done here.
+Otherwise, if you want to upload files to a specific folder, do the following steps to find the folder ID of your target folder.
+
+1. Open the [root directory](https://my.pcloud.com/#page=filemanager) of your cloud in the browser.
+2. (Optional) Create the folder where you want to upload the files. 
+   Note that if you have chosen to give your app only access to a specific private app folder, 
+   go look for a folder with your app name in the `Applications` directory of the root directory of your cloud.
+   By default, all files will be uploaded there and you don't need to specifically set the folder ID. 
+   However, if desired, you can also create another subfolder there.
+3. Navigate to the exact folder where you want the files to be uploaded.
+4. Look at the URL bar of your browser and copy the value of the `folder=<FOLDER_ID>` parameter 
+   into the `PCLOUD_FOLDER_ID` environment variable.
