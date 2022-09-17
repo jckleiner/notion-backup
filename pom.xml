@@ -101,6 +101,13 @@
 			<version>3.1.5</version>
 		</dependency>
 
+		<!-- PCLOUD API -->
+		<dependency>
+			<groupId>com.pcloud.sdk</groupId>
+			<artifactId>java-core</artifactId>
+			<version>1.8.1</version>
+		</dependency>
+
 		<!-- LOMBOK -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

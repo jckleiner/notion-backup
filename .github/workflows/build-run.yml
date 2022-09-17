@@ -45,5 +45,9 @@ jobs:
         NEXTCLOUD_EMAIL: ${{ secrets.NEXTCLOUD_EMAIL }}
         NEXTCLOUD_PASSWORD: ${{ secrets.NEXTCLOUD_PASSWORD }}
         NEXTCLOUD_WEBDAV_URL: ${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+        
+        PCLOUD_ACCESS_TOKEN: ${{ secrets.PCLOUD_ACCESS_TOKEN }}
+        PCLOUD_API_HOST: ${{ secrets.PCLOUD_API_HOST }}
+        PCLOUD_FOLDER_ID: ${{ secrets.PCLOUD_FOLDER_ID }}
 
         DOWNLOADS_DIRECTORY_PATH: /tmp/
