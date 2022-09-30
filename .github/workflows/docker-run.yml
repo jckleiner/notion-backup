@@ -14,7 +14,7 @@ jobs:
       - uses: kohlerdominik/docker-run-action@v1
         with:
           # public, private or local image
-          image: jckleiner/notion-backup
+          image: ghcr.io/jckleiner/notion-backup
           # pass or create environment variables
           environment: |
             NOTION_SPACE_ID=${{ secrets.NOTION_SPACE_ID }}
@@ -38,7 +38,6 @@ jobs:
 
           # run is required: "Error: Input required and not supplied: run"
           run: |
-            echo "hello world"
             uname -a
 
 

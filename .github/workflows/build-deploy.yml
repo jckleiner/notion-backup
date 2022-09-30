@@ -23,18 +23,29 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml --no-transfer-progress
 
-      - name: Login to DockerHub
+      # needed for multi-platform builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      # needed for multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # provided by GitHub
 
       - name: Build and push image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
+          # needed for multi-platform builds
+          platforms: linux/amd64,linux/arm64
           context: .
           push: true
-          tags: jckleiner/notion-backup:latest
+          tags: ghcr.io/jckleiner/notion-backup:latest
           build-args: |
             PATH_TO_JAR=./target/notion-backup-1.0-SNAPSHOT.jar
 
