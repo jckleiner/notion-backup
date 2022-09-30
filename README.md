@@ -47,7 +47,7 @@ Once you created your `.env` file, you can run the following command to start yo
 docker run \
     --rm=true \
     --env-file=.env \
-    jckleiner/notion-backup
+    ghcr.io/jckleiner/notion-backup
 ```
 
 The downloaded Notion export file will be saved to the `/downloads` folder **within the Docker container** and the container
@@ -66,7 +66,7 @@ docker run \
     --rm=true \
     --env-file=.env \
     -v <backup-dir-absolute-path-on-your-machine>:/downloads \
-    jckleiner/notion-backup
+    ghcr.io/jckleiner/notion-backup
 ```
 
 If you want automatic backups in regular intervals, you could either set up a cronjob on your local machine or 
