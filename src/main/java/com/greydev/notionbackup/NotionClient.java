@@ -160,6 +160,8 @@ public class NotionClient {
 		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 		JsonNode responseJsonNode = objectMapper.readTree(response.body());
+		System.out.println("responseJsonNode: " + responseJsonNode);
+		System.out.println("responseJsonNode.get(\"taskId\"): " + responseJsonNode.get("taskId"));
 		return responseJsonNode.get("taskId").asText();
 	}
 
