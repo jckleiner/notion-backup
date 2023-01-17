@@ -1,4 +1,4 @@
-name: notion-backup-build-deploy
+name: Build and push new docker image
 
 on:
   push:
@@ -6,8 +6,6 @@ on:
 
   # adds a "run workflow" button to the page
   workflow_dispatch:
-
-# Share data between jobs: actions/upload-artifact, actions/download-artifact
 
 jobs:
   build-deploy-jar:

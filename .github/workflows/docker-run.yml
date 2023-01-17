@@ -1,4 +1,4 @@
-name: notion-backup-docker-run
+name: Start notion backup (using docker)
 
 on:
   # adds a "run workflow" button to the page
