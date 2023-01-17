@@ -95,10 +95,15 @@ public class NotionClient {
 
 	public Optional<File> export() {
 		try {
-			String taskId = triggerExportTask();
+			Optional<String> taskId = triggerExportTask();
 			log.info("taskId extracted");
 
-			Optional<String> downloadLink = getDownloadLink(taskId);
+			if (taskId.isEmpty()) {
+				log.info("taskId could not be extracted");
+				return Optional.empty();
+			}
+
+			Optional<String> downloadLink = getDownloadLink(taskId.get());
 			if (downloadLink.isEmpty()) {
 				log.info("downloadLink could not be extracted");
 				return Optional.empty();
@@ -149,7 +154,7 @@ public class NotionClient {
 	}
 
 
-	private String triggerExportTask() throws IOException, InterruptedException {
+	private Optional<String> triggerExportTask() throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(ENQUEUE_ENDPOINT))
 				.header("Cookie", TOKEN_V2 + "=" + notionTokenV2)
@@ -160,9 +165,21 @@ public class NotionClient {
 		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 		JsonNode responseJsonNode = objectMapper.readTree(response.body());
-		System.out.println("responseJsonNode: " + responseJsonNode);
-		System.out.println("responseJsonNode.get(\"taskId\"): " + responseJsonNode.get("taskId"));
-		return responseJsonNode.get("taskId").asText();
+
+		/*	This will be the response if the given token is not valid anymore (for example if a logout occurred)
+			{
+				"errorId": "<some-UUID>",
+				"name":"UnauthorizedError",
+				"message":"Token was invalid or expired.",
+				"clientData":{"type":"login_try_again"}
+			}
+		 */
+		if (responseJsonNode.get("taskId") == null) {
+			log.error("Error name: {}, error message: {}", responseJsonNode.get("name"), responseJsonNode.get("message"));
+			return Optional.empty();
+		}
+
+		return Optional.of(responseJsonNode.get("taskId").asText());
 	}
 
 
