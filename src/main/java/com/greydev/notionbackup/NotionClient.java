@@ -30,25 +30,21 @@ public class NotionClient {
 
 	private static final String GET_TASKS_ENDPOINT = "https://www.notion.so/api/v3/getTasks";
 	private static final String ENQUEUE_ENDPOINT = "https://www.notion.so/api/v3/enqueueTask";
-	private static final String LOGIN_ENDPOINT = "https://www.notion.so/api/v3/loginWithEmail";
 	private static final String TOKEN_V2 = "token_v2";
 	private static final String EXPORT_FILE_NAME = "notion-export";
 	private static final String EXPORT_FILE_EXTENSION = ".zip";
 
 	private static final String KEY_DOWNLOADS_DIRECTORY_PATH = "DOWNLOADS_DIRECTORY_PATH";
 	private static final String KEY_NOTION_SPACE_ID = "NOTION_SPACE_ID";
-	private static final String KEY_NOTION_EMAIL = "NOTION_EMAIL";
-	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
+	private static final String KEY_NOTION_TOKEN_V2 = "NOTION_TOKEN_V2";
 	private static final String KEY_NOTION_EXPORT_TYPE = "NOTION_EXPORT_TYPE";
 	private static final String KEY_NOTION_FLATTEN_EXPORT_FILETREE = "NOTION_FLATTEN_EXPORT_FILETREE";
 	private static final String DEFAULT_NOTION_EXPORT_TYPE = "markdown";
 	private static final boolean DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE = false;
 	private static final String DEFAULT_DOWNLOADS_PATH = "/downloads";
 
-
 	private final String notionSpaceId;
-	private final String notionEmail;
-	private final String notionPassword;
+	private final String notionTokenV2;
 	private final String exportType;
 	private final boolean flattenExportFiletree;
 	private String downloadsDirectoryPath;
@@ -65,8 +61,7 @@ public class NotionClient {
 
 		// both environment variables and variables defined in the .env file can be accessed this way
 		notionSpaceId = dotenv.get(KEY_NOTION_SPACE_ID);
-		notionEmail = dotenv.get(KEY_NOTION_EMAIL);
-		notionPassword = dotenv.get(KEY_NOTION_PASSWORD);
+		notionTokenV2 = dotenv.get(KEY_NOTION_TOKEN_V2);
 		downloadsDirectoryPath = dotenv.get(KEY_DOWNLOADS_DIRECTORY_PATH);
 
 		if (StringUtils.isBlank(downloadsDirectoryPath)) {
@@ -92,28 +87,18 @@ public class NotionClient {
 		if (StringUtils.isBlank(notionSpaceId)) {
 			exit(KEY_NOTION_SPACE_ID + " is missing!");
 		}
-		if (StringUtils.isBlank(notionEmail)) {
-			exit(KEY_NOTION_EMAIL + " is missing!");
-		}
-		if (StringUtils.isBlank(notionPassword)) {
-			exit(KEY_NOTION_PASSWORD + " is missing!");
+		if (StringUtils.isBlank(notionTokenV2)) {
+			exit(KEY_NOTION_TOKEN_V2 + " is missing!");
 		}
 	}
 
 
 	public Optional<File> export() {
 		try {
-			Optional<String> tokenV2 = getTokenV2();
-			if (tokenV2.isEmpty()) {
-				log.info("tokenV2 could not be extracted");
-				return Optional.empty();
-			}
-			log.info("tokenV2 extracted");
-
-			String taskId = triggerExportTask(tokenV2.get());
+			String taskId = triggerExportTask();
 			log.info("taskId extracted");
 
-			Optional<String> downloadLink = getDownloadLink(taskId, tokenV2.get());
+			Optional<String> downloadLink = getDownloadLink(taskId);
 			if (downloadLink.isEmpty()) {
 				log.info("downloadLink could not be extracted");
 				return Optional.empty();
@@ -164,43 +149,10 @@ public class NotionClient {
 	}
 
 
-	// TODO create gist
-	private Optional<String> getTokenV2() throws IOException, InterruptedException {
-		String credentialsTemplate = "{" +
-				"\"email\": \"%s\"," +
-				"\"password\": \"%s\"" +
-				"}";
-		String credentialsJson = String.format(credentialsTemplate, notionEmail, notionPassword);
-
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(LOGIN_ENDPOINT))
-				.POST(HttpRequest.BodyPublishers.ofString(credentialsJson))
-				.timeout(Duration.ofSeconds(10))
-				.header("Content-Type", "application/json")
-				.build();
-
-		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-		if (response.statusCode() == 429) {
-			log.warn("Too many requests were sent. Notion is returning a 429 status code (Too many requests).");
-			return Optional.empty();
-		}
-
-		return Optional.of(cookieManager.getCookieStore()
-				.get(URI.create(LOGIN_ENDPOINT))
-				.stream()
-				.filter(cookie -> TOKEN_V2.equals(cookie.getName()))
-				.findFirst()
-				.orElseThrow()
-				.getValue());
-
-	}
-
-
-	private String triggerExportTask(String tokenV2) throws IOException, InterruptedException {
+	private String triggerExportTask() throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(ENQUEUE_ENDPOINT))
-				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
+				.header("Cookie", TOKEN_V2 + "=" + notionTokenV2)
 				.header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(getTaskJson()))
 				.build();
@@ -212,12 +164,12 @@ public class NotionClient {
 	}
 
 
-	private Optional<String> getDownloadLink(String taskId, String tokenV2) throws IOException, InterruptedException {
+	private Optional<String> getDownloadLink(String taskId) throws IOException, InterruptedException {
 		String postBody = String.format("{\"taskIds\": [\"%s\"]}", taskId);
 
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(GET_TASKS_ENDPOINT))
-				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
+				.header("Cookie", TOKEN_V2 + "=" + notionTokenV2)
 				.header("Content-Type", "application/json")
 				.timeout(Duration.ofSeconds(10))
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
