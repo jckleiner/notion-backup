@@ -96,12 +96,12 @@ public class NotionClient {
 	public Optional<File> export() {
 		try {
 			Optional<String> taskId = triggerExportTask();
-			log.info("taskId extracted");
 
 			if (taskId.isEmpty()) {
 				log.info("taskId could not be extracted");
 				return Optional.empty();
 			}
+			log.info("taskId extracted");
 
 			Optional<String> downloadLink = getDownloadLink(taskId.get());
 			if (downloadLink.isEmpty()) {
