@@ -200,7 +200,7 @@ public class NotionClient {
 			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
 			Results results = objectMapper.readValue(response.body(), Results.class);
 
-			if (!results.getResults().isEmpty()) {
+			if (results.getResults().isEmpty()) {
 				sleep(6000);
 				continue;
 			}
