@@ -15,8 +15,14 @@ public class Result {
 
 	private Status status;
 
+	private String error; // error description
+
 	public boolean isSuccess() {
 		return StringUtils.equalsIgnoreCase(this.state, "success");
+	}
+
+	public boolean isFailure() {
+		return StringUtils.equalsIgnoreCase(this.state, "failure");
 	}
 
 }

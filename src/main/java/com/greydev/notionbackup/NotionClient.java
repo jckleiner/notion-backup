@@ -182,31 +182,35 @@ public class NotionClient {
 			Results results = objectMapper.readValue(response.body(), Results.class);
 
 			if (!results.getResults().isEmpty()) {
-				Result result = results.getResults().stream().findFirst().get();
-
-				if (result.getStatus() != null) {
-					log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
-
-					if (StringUtils.isNotBlank(result.getStatus().getExportUrl())) {
-						log.info("Notion response now contains the export url. 'state': '{}', Pages exported so far: {}, Status.type: {}",
-								result.getState(), result.getStatus().getPagesExported(), result.getStatus().getType());
-					}
-				}
-
-				if (result.isSuccess()) {
-					log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
-					return Optional.of(result.getStatus().getExportUrl());
-				}
-
+				sleep(6000);
+				continue;
 			}
 
-			sleep(6000);
+			Result result = results.getResults().stream().findFirst().get();
+
+			if (result.isFailure()) {
+				log.info("Notion API workspace export returned a 'failure' state. Reason: {}", result.getError());
+				return Optional.empty();
+			}
+
+			if (result.getStatus() != null) {
+				log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
+
+				if (StringUtils.isNotBlank(result.getStatus().getExportUrl())) {
+					log.info("Notion response now contains the export url. 'state': '{}', Pages exported so far: {}, Status.type: {}",
+							result.getState(), result.getStatus().getPagesExported(), result.getStatus().getType());
+				}
+			}
+
+			if (result.isSuccess()) {
+				log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
+				return Optional.of(result.getStatus().getExportUrl());
+			}
 		}
 
 		log.info("Notion workspace export failed. After waiting 80 minutes, the export status from the Notion API response was still not 'success'");
 		return Optional.empty();
 	}
-
 
 	private String getTaskJson() {
 		String taskJsonTemplate = "{" +
@@ -223,7 +227,7 @@ public class NotionClient {
 				"    }" +
 				"  }" +
 				"}";
-		return String.format(taskJsonTemplate, notionSpaceId, exportType, flattenExportFiletree);
+		return String.format(taskJsonTemplate, notionSpaceId, exportType.toLowerCase(), flattenExportFiletree);
 	}
 
 
