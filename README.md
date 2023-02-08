@@ -1,6 +1,6 @@
 # notion-backup
 
-![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-build-run/badge.svg?branch=master)
+![example workflow name](https://github.com/jckleiner/notion-backup/actions/workflows/build-run.yml/badge.svg?branch=master)
 
 > ⚠️ Notion changed their API around 12.2022 which broke the automatic login requests made by this tool to extract the 
 > `token_v2`.

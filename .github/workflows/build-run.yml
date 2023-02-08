@@ -1,4 +1,4 @@
-name: Start notion backup
+name: Start Notion backup
 
 on:
   push:
