@@ -2,6 +2,15 @@
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/workflows/notion-backup-build-run/badge.svg?branch=master)
 
+> ⚠️ Notion changed their API around 12.2022 which broke the automatic login requests made by this tool to extract the 
+> `token_v2`.
+> 
+> To solve this new limitation, you need to copy the value of the `token_v2` cookie manually (see [How do I find 
+> all these values?](./documentation/setup.md) for more info). This means if you 
+> log out from that account then your token won't be valid anymore. You will have to log in and fetch the token 
+> again.
+
+
 Automatically backup your Notion workspace to Google Drive, Dropbox, pCloud, Nextcloud or to your local machine.
 
 ### Set Credentials
@@ -12,8 +21,7 @@ Create a `.env` file with the following properties ([How do I find all these val
     
     # Notion (Required)
     NOTION_SPACE_ID=
-    NOTION_EMAIL=
-    NOTION_PASSWORD=
+    NOTION_TOKEN_V2=
     # Options: markdown, html (default is markdown)
     NOTION_EXPORT_TYPE=markdown
     # Create folders for nested pages? Options: true, false (default is false)

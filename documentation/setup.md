@@ -3,10 +3,14 @@
 1. Login to your [notion profile](https://www.notion.so/login)
 2. Open your developer console of your browser and go to the "Network" tab
 3. Click on "Quick Find" on the Notion menu (should be at the upper left corner) and type something in the search bar
-4. Typing will trigger a new request with the name `search` which should be visible under the network tab. Open that
-   request and copy the value of `spaceId`
+4. Typing will trigger a new request with the name `search` which should be visible under the **network tab**. Open that
+   request and copy the value of `spaceId`. Paste it in your `.env` file as the value for `NOTION_SPACE_ID`
 
 ![testImage](../images/notion-search-request.png)
+
+5. Go to **cookies tab** of that same requests and find the `token_v2` cookie. Paste it in your `.env` file as the value 
+   for `NOTION_TOKEN_V2`. Note that this token is expires after a year but if you log out manually then this token 
+   won't be valid anymore! Which means you will have to log in again and extract the value of a new `token_v2` cookie.
 
 ### Dropbox
 

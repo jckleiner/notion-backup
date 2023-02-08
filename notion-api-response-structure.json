@@ -62,3 +62,36 @@
     }
   ]
 }
+
+// failure
+{
+  "results": [
+    {
+      "id": "<id>",
+      "eventName": "exportSpace",
+      "request": {
+        "spaceId": "<workspace-id>",
+        "exportOptions": {
+          "exportType": "MARKDOWN",
+          "flattenExportFiletree": false,
+          "timeZone": "Europe/Berlin",
+          "locale": "en"
+        }
+      },
+      "actor": {
+        "table": "notion_user",
+        "id": "<id>"
+      },
+      "state": "failure",
+      "rootRequest": {
+        "eventName": "exportSpace",
+        "requestId": "<id>"
+      },
+      "headers": {
+        "ip": "<ip-address>"
+      },
+      "equeuedAt": 1673994491013,
+      "error": "Invalid input."
+    }
+  ]
+}
