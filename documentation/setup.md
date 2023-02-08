@@ -15,12 +15,12 @@
 ### Dropbox
 
 1. Create a new app on developer console (https://www.dropbox.com/developers/apps/create)
-2. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your changes.
-   Make sure you saved these changes **before** you generate your access token
-3. Go to Settings > OAuth 2 > Generate access token > generate > Access token expiration: "no expiration" and copy the
-   generated token
-
-> Long-lived tokens are less secure and will be deprecated in the future.
+2. Select "Scoped access" > "App folder – Access to a single folder created specifically for your app." and give 
+   your app a name
+3. Go to permissions tab > enable `files.content.write` & `files.content.read` and click "Submit" to save your changes.
+   Make sure you saved these changes **before** you generate your access token.
+4. Go to Settings > OAuth 2 > Generate access token > "generate" and copy the generated token. Paste it in your      
+   `.env` file as the value for `DROPBOX_ACCESS_TOKEN`
 
 ### Nextcloud
 
