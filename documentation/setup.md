@@ -1,4 +1,4 @@
-### Find Your notion-space-id
+### Find Your notion-space-id and token_v2
 
 1. Login to your [notion profile](https://www.notion.so/login)
 2. Open your developer console of your browser and go to the "Network" tab
