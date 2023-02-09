@@ -6,9 +6,7 @@
 > `token_v2`.
 > 
 > To solve this new limitation, you need to copy the value of the `token_v2` cookie manually (see [How do I find 
-> all these values?](./documentation/setup.md) for more info). This means if you 
-> log out from that account then your token won't be valid anymore. You will have to log in and fetch the token 
-> again.
+> all these values?](./documentation/setup.md) for more info).
 
 
 Automatically backup your Notion workspace to Google Drive, Dropbox, pCloud, Nextcloud or to your local machine.

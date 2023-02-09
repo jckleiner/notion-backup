@@ -9,8 +9,9 @@
 ![testImage](../images/notion-search-request.png)
 
 5. Go to **cookies tab** of that same requests and find the `token_v2` cookie. Paste it in your `.env` file as the value 
-   for `NOTION_TOKEN_V2`. Note that this token is expires after a year but if you log out manually then this token 
-   won't be valid anymore! Which means you will have to log in again and extract the value of a new `token_v2` cookie.
+   for `NOTION_TOKEN_V2`. This token (expires after one year and) is valid as long as you don't log out over the 
+   web-UI. Meaning that you can use it in this tool as long as you don't log out. If you do log out (or if the token 
+   expires after one year) then you need to log in again and fetch a new `token_v2` value.
 
 ### Dropbox
 
