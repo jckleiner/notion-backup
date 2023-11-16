@@ -201,7 +201,7 @@ public class NotionClient {
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
-		for (int i = 0; i < 800; i++) {
+		for (int i = 0; i < 8000; i++) {
 			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
