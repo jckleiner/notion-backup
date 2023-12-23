@@ -17,26 +17,26 @@ jobs:
           image: ghcr.io/jckleiner/notion-backup
           # pass or create environment variables
           environment: |
-            NOTION_SPACE_ID=${{ secrets.NOTION_SPACE_ID }}
-            NOTION_TOKEN_V2=${{ secrets.NOTION_TOKEN_V2 }}
+            NOTION_SPACE_ID='${{ secrets.NOTION_SPACE_ID }}'
+            NOTION_TOKEN_V2='${{ secrets.NOTION_TOKEN_V2 }}'
             
-            GOOGLE_DRIVE_ROOT_FOLDER_ID=${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
-            GOOGLE_DRIVE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
-            GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
-            GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH }}
+            GOOGLE_DRIVE_ROOT_FOLDER_ID='${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}'
+            GOOGLE_DRIVE_SERVICE_ACCOUNT='${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}'
+            GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON='${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}'
+            GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH='${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH }}'
             
-            DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
-            DROPBOX_APP_KEY=${{ secrets.DROPBOX_APP_KEY }}
-            DROPBOX_APP_SECRET=${{ secrets.DROPBOX_APP_SECRET }}
-            DROPBOX_REFRESH_TOKEN=${{ secrets.DROPBOX_REFRESH_TOKEN }}
+            DROPBOX_ACCESS_TOKEN='${{ secrets.DROPBOX_ACCESS_TOKEN }}'
+            DROPBOX_APP_KEY='${{ secrets.DROPBOX_APP_KEY }}'
+            DROPBOX_APP_SECRET='${{ secrets.DROPBOX_APP_SECRET }}'
+            DROPBOX_REFRESH_TOKEN='${{ secrets.DROPBOX_REFRESH_TOKEN }}'
             
-            NEXTCLOUD_EMAIL=${{ secrets.NEXTCLOUD_EMAIL }}
-            NEXTCLOUD_PASSWORD=${{ secrets.NEXTCLOUD_PASSWORD }}
-            NEXTCLOUD_WEBDAV_URL=${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+            NEXTCLOUD_EMAIL='${{ secrets.NEXTCLOUD_EMAIL }}'
+            NEXTCLOUD_PASSWORD='${{ secrets.NEXTCLOUD_PASSWORD }}'
+            NEXTCLOUD_WEBDAV_URL='${{ secrets.NEXTCLOUD_WEBDAV_URL }}'
             
-            PCLOUD_ACCESS_TOKEN=${{ secrets.PCLOUD_ACCESS_TOKEN }}
-            PCLOUD_API_HOST=${{ secrets.PCLOUD_API_HOST }}
-            PCLOUD_FOLDER_ID=${{ secrets.PCLOUD_FOLDER_ID }}
+            PCLOUD_ACCESS_TOKEN='${{ secrets.PCLOUD_ACCESS_TOKEN }}'
+            PCLOUD_API_HOST='${{ secrets.PCLOUD_API_HOST }}'
+            PCLOUD_FOLDER_ID='${{ secrets.PCLOUD_FOLDER_ID }}'
 
           # run is required: "Error: Input required and not supplied: run"
           run: |
