@@ -34,7 +34,8 @@ Do the following steps to set up the refresh token flow.
 
 4. Click on continue and allow the app to access your files
 5. Copy the authorization code (referred to as `AUTH_CODE` in the following steps) shown in the following screen
-6. Send the following HTTP POST request with the actual values replacing the placeholders
+6. Send the following HTTP POST request with the actual values replacing the placeholders. 
+   Note that you need to encode the string `<app-key>:<app-secret>` as a BASE64 string.
 
 ```
 curl --request POST \

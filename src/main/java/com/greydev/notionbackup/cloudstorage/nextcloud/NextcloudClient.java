@@ -40,6 +40,7 @@ public class NextcloudClient implements CloudStorageClient {
 
 			if (response.statusCode() == 201) {
 				log.info("Nextcloud: successfully uploaded '{}'", fileToUpload.getName());
+				return true;
 			} else if (response.statusCode() == 204) {
 				log.info("Nextcloud: file upload response code is {}). " +
 						"This probably means a file with the same name already exists and it was overwritten/replaced.", response.statusCode());
@@ -50,7 +51,7 @@ public class NextcloudClient implements CloudStorageClient {
 			}
 
 		} catch (IOException | InterruptedException e) {
-			log.error("Exception: ", e);
+			log.error("Nextcloud Exception: ", e);
 		}
 
 		return false;
