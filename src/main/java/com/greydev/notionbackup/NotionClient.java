@@ -39,14 +39,17 @@ public class NotionClient {
 	private static final String KEY_NOTION_TOKEN_V2 = "NOTION_TOKEN_V2";
 	private static final String KEY_NOTION_EXPORT_TYPE = "NOTION_EXPORT_TYPE";
 	private static final String KEY_NOTION_FLATTEN_EXPORT_FILETREE = "NOTION_FLATTEN_EXPORT_FILETREE";
+	private static final String KEY_NOTION_EXPORT_COMMENTS = "NOTION_EXPORT_COMMENTS";
 	private static final String DEFAULT_NOTION_EXPORT_TYPE = "markdown";
 	private static final boolean DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE = false;
+	private static final boolean DEFAULT_NOTION_EXPORT_COMMENTS = true;
 	private static final String DEFAULT_DOWNLOADS_PATH = "/downloads";
 
 	private final String notionSpaceId;
 	private final String notionTokenV2;
 	private final String exportType;
 	private final boolean flattenExportFiletree;
+	private final boolean exportComments;
 	private String downloadsDirectoryPath;
 
 	private final HttpClient newClient;
@@ -75,11 +78,15 @@ public class NotionClient {
 		flattenExportFiletree = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_FLATTEN_EXPORT_FILETREE)) ?
 				Boolean.parseBoolean(dotenv.get(KEY_NOTION_FLATTEN_EXPORT_FILETREE)) :
 				DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE;
+		exportComments = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_EXPORT_COMMENTS)) ?
+				Boolean.parseBoolean(dotenv.get(KEY_NOTION_EXPORT_COMMENTS)) :
+				DEFAULT_NOTION_EXPORT_COMMENTS;
 
 		exitIfRequiredEnvVariablesNotValid();
 
 		log.info("Using export type: {}", exportType);
 		log.info("Flatten export file tree: {}", flattenExportFiletree);
+		log.info("Export comments: {}", exportComments);
 	}
 
 
@@ -194,7 +201,7 @@ public class NotionClient {
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
-		for (int i = 0; i < 800; i++) {
+		for (int i = 0; i < 8000; i++) {
 			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
@@ -237,6 +244,7 @@ public class NotionClient {
 				"    \"eventName\": \"exportSpace\"," +
 				"    \"request\": {" +
 				"      \"spaceId\": \"%s\"," +
+				"      \"shouldExportComments\": %s," +
 				"      \"exportOptions\": {" +
 				"        \"exportType\": \"%s\"," +
 				"        \"flattenExportFiletree\": %s," +
@@ -246,7 +254,7 @@ public class NotionClient {
 				"    }" +
 				"  }" +
 				"}";
-		return String.format(taskJsonTemplate, notionSpaceId, exportType.toLowerCase(), flattenExportFiletree);
+		return String.format(taskJsonTemplate, notionSpaceId, exportComments, exportType.toLowerCase(), flattenExportFiletree);
 	}
 
 

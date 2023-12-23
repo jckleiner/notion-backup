@@ -24,6 +24,8 @@ Create a `.env` file with the following properties ([How do I find all these val
     NOTION_EXPORT_TYPE=markdown
     # Create folders for nested pages? Options: true, false (default is false)
     NOTION_FLATTEN_EXPORT_FILETREE=false
+    # Should export comments? Options: true, false (default is true)
+    NOTION_EXPORT_COMMENTS=true
 
     # Google Drive (Optional)
     GOOGLE_DRIVE_ROOT_FOLDER_ID=
