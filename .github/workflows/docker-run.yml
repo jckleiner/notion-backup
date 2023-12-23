@@ -17,9 +17,8 @@ jobs:
           image: ghcr.io/jckleiner/notion-backup
           # pass or create environment variables
           environment: |
-            NOTION_SPACE_ID=${{ secrets.NOTION_SPACE_ID }}
-            NOTION_EMAIL=${{ secrets.NOTION_EMAIL }}
-            NOTION_PASSWORD=${{ secrets.NOTION_PASSWORD }}
+            NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+            NOTION_TOKEN_V2: ${{ secrets.NOTION_TOKEN_V2 }}
             
             GOOGLE_DRIVE_ROOT_FOLDER_ID=${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
             GOOGLE_DRIVE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
