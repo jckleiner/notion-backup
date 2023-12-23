@@ -14,6 +14,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.oauth.DbxCredential;
+import com.dropbox.core.oauth.DbxRefreshResult;
 import com.google.api.services.drive.Drive;
 import com.greydev.notionbackup.cloudstorage.dropbox.DropboxClient;
 import com.greydev.notionbackup.cloudstorage.dropbox.DropboxServiceFactory;
@@ -29,6 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 public class NotionBackup {
 
 	public static final String KEY_DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
+	public static final String KEY_DROPBOX_APP_KEY = "DROPBOX_APP_KEY";
+	public static final String KEY_DROPBOX_APP_SECRET = "DROPBOX_APP_SECRET";
+	public static final String KEY_DROPBOX_REFRESH_TOKEN = "DROPBOX_REFRESH_TOKEN";
 
 	public static final String KEY_NEXTCLOUD_EMAIL = "NEXTCLOUD_EMAIL";
 	public static final String KEY_NEXTCLOUD_PASSWORD = "NEXTCLOUD_PASSWORD";
@@ -90,19 +97,49 @@ public class NotionBackup {
 
 
 	public static void startDropboxBackup(File fileToUpload) {
-		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
-
-		if (StringUtils.isBlank(dropboxAccessToken)) {
-			log.info("Skipping Dropbox upload. {} is blank.", KEY_DROPBOX_ACCESS_TOKEN);
+		Optional<String> dropboxAccessToken = getDropboxAccessToken();
+		if (dropboxAccessToken.isEmpty()) {
+			log.info("No Dropbox access token available. Skipping Dropbox upload.");
 			return;
 		}
-		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken);
+
+		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken.get());
 		if (dropboxServiceOptional.isEmpty()) {
 			log.warn("Could not create Dropbox service. Skipping Dropbox upload");
 			return;
 		}
 		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
 		dropboxClient.upload(fileToUpload);
+	}
+
+	private static Optional<String> getDropboxAccessToken() {
+		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
+
+		if (StringUtils.isBlank(dropboxAccessToken)) {
+			log.info("{} is blank. Trying to fetch an access token with the refresh token...", KEY_DROPBOX_ACCESS_TOKEN);
+
+			String dropboxAppKey = dotenv.get(KEY_DROPBOX_APP_KEY);
+			String dropboxAppSecret = dotenv.get(KEY_DROPBOX_APP_SECRET);
+			String dropboxRefreshToken = dotenv.get(KEY_DROPBOX_REFRESH_TOKEN);
+			if (StringUtils.isAnyBlank(dropboxAppKey, dropboxAppSecret, dropboxRefreshToken)) {
+				log.info("Failed to fetch an access token. Either {}, {} or {} is blank.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
+				return Optional.empty();
+			}
+
+			DbxCredential dbxCredential = new DbxCredential("", 14400L, dropboxRefreshToken, dropboxAppKey, dropboxAppSecret);
+			DbxRefreshResult refreshResult;
+			try {
+				refreshResult = dbxCredential.refresh(new DbxRequestConfig("NotionBackup"));
+			} catch (DbxException e) {
+				log.info("Token refresh call to Dropbox API failed.");
+				return Optional.empty();
+			}
+
+			dropboxAccessToken = refreshResult.getAccessToken();
+			log.info("Successfully fetched an access token.");
+		}
+
+		return Optional.of(dropboxAccessToken);
 	}
 
 

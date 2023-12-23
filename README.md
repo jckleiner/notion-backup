@@ -36,6 +36,9 @@ Create a `.env` file with the following properties ([How do I find all these val
 
     # Dropbox (Optional)
     DROPBOX_ACCESS_TOKEN=
+    DROPBOX_APP_KEY=
+    DROPBOX_APP_SECRET=
+    DROPBOX_REFRESH_TOKEN=
 
     # Nextcloud (Optional)
     NEXTCLOUD_EMAIL=
