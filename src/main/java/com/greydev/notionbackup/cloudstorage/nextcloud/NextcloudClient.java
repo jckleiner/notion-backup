@@ -50,7 +50,7 @@ public class NextcloudClient implements CloudStorageClient {
 			}
 
 		} catch (IOException | InterruptedException e) {
-			log.error("Exception: ", e);
+			log.error("Nextcloud Exception: ", e);
 		}
 
 		return false;

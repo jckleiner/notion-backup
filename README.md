@@ -50,6 +50,9 @@ Create a `.env` file with the following properties ([How do I find all these val
     PCLOUD_API_HOST=
     PCLOUD_FOLDER_ID=
 
+    # if you don't use the Docker image and want to download the backup to a different folder 
+    # DOWNLOADS_DIRECTORY_PATH=<absolute-folder-path>
+
 ### Backup to Cloud With Docker
 
 Once you created your `.env` file, you can run the following command to start your backup:

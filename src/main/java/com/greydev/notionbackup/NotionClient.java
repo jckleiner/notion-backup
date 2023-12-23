@@ -182,7 +182,11 @@ public class NotionClient {
 			}
 		 */
 		if (responseJsonNode.get("taskId") == null) {
-			log.error("Error name: {}, error message: {}", responseJsonNode.get("name"), responseJsonNode.get("message"));
+			JsonNode errorName = responseJsonNode.get("name");
+			log.error("Error name: {}, error message: {}", errorName, responseJsonNode.get("message"));
+			if (StringUtils.equalsIgnoreCase(errorName.toString(), "UnauthorizedError")) {
+				log.error("UnauthorizedError: seems like your token is not valid anymore. Try to log in to Notion again and replace you old token.");
+			}
 			return Optional.empty();
 		}
 
@@ -201,10 +205,9 @@ public class NotionClient {
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
-		for (int i = 0; i < 8000; i++) {
+		for (int i = 0; i < 800; i++) {
 			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
 			Results results = objectMapper.readValue(response.body(), Results.class);
 
 			if (results.getResults().isEmpty()) {
@@ -232,6 +235,7 @@ public class NotionClient {
 				log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
 				return Optional.of(result.getStatus().getExportUrl());
 			}
+		sleep(6000);
 		}
 
 		log.info("Notion workspace export failed. After waiting 80 minutes, the export status from the Notion API response was still not 'success'");

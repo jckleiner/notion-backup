@@ -2,8 +2,10 @@ package com.greydev.notionbackup;
 
 import java.io.File;
 import java.io.IOException;
+import java.rmi.UnexpectedException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.greydev.notionbackup.cloudstorage.pcloud.PCloudApiClientFactory;
 import com.greydev.notionbackup.cloudstorage.pcloud.PCloudClient;
@@ -66,12 +68,42 @@ public class NotionBackup {
 		// use a local file to skip the notion export step
 		// final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");
 
-		CompletableFuture<Void> futureGoogleDrive = CompletableFuture.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile));
-		CompletableFuture<Void> futureDropbox = CompletableFuture.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile));
-		CompletableFuture<Void> futureNextcloud = CompletableFuture.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile));
-		CompletableFuture<Void> futurePCloud = CompletableFuture.runAsync(() -> NotionBackup.startPCloudBackup(exportedFile));
+		AtomicBoolean hasErrorOccurred = new AtomicBoolean(false);
+
+		CompletableFuture<Void> futureGoogleDrive = CompletableFuture
+				.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile))
+				.handle((result, ex) -> {
+					if (ex != null) hasErrorOccurred.set(true);
+					return null;
+				});
+
+		CompletableFuture<Void> futureDropbox = CompletableFuture
+				.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile))
+				.handle((result, ex) -> {
+					if (ex != null) hasErrorOccurred.set(true);
+					return null;
+				});
+
+		CompletableFuture<Void> futureNextcloud = CompletableFuture
+				.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile))
+				.handle((result, ex) -> {
+					if (ex != null) hasErrorOccurred.set(true);
+					return null;
+				});
+
+		CompletableFuture<Void> futurePCloud = CompletableFuture
+				.runAsync(() -> NotionBackup.startPCloudBackup(exportedFile))
+				.handle((result, ex) -> {
+					if (ex != null) hasErrorOccurred.set(true);
+					return null;
+				});
 
 		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud, futurePCloud).join();
+
+		if (hasErrorOccurred.get()) {
+			log.error("Not all backups were completed successfully. See the logs above to get more information about the errors.");
+			System.exit(1);
+		}
 	}
 
 
@@ -92,7 +124,11 @@ public class NotionBackup {
 			return;
 		}
 		GoogleDriveClient GoogleDriveClient = new GoogleDriveClient(googleServiceOptional.get(), googleDriveRootFolderId);
-		GoogleDriveClient.upload(fileToUpload);
+		boolean isSuccess = GoogleDriveClient.upload(fileToUpload);
+
+		if (!isSuccess) {
+			throw new IllegalStateException("Backup was not successful");
+		}
 	}
 
 
@@ -109,7 +145,11 @@ public class NotionBackup {
 			return;
 		}
 		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
-		dropboxClient.upload(fileToUpload);
+		boolean isSuccess =  dropboxClient.upload(fileToUpload);
+
+		if (!isSuccess) {
+			throw new IllegalStateException("Backup was not successful");
+		}
 	}
 
 	private static Optional<String> getDropboxAccessToken() {
@@ -153,7 +193,11 @@ public class NotionBackup {
 			return;
 		}
 
-		new NextcloudClient(email, password, webdavUrl).upload(fileToUpload);
+		boolean isSuccess = new NextcloudClient(email, password, webdavUrl).upload(fileToUpload);
+
+		if (!isSuccess) {
+			throw new IllegalStateException("Backup was not successful");
+		}
 	}
 
 	public static void startPCloudBackup(File fileToUpload) {
@@ -182,7 +226,11 @@ public class NotionBackup {
 			}
 		}
 		PCloudClient pCloudClient = new PCloudClient(pCloudApiClient.get(), pCloudFolderId);
-		pCloudClient.upload(fileToUpload);
+		boolean isSuccess = pCloudClient.upload(fileToUpload);
+
+		if (!isSuccess) {
+			throw new IllegalStateException("Backup was not successful");
+		}
 	}
 
 	private static Optional<String> extractGoogleServiceAccountSecret() {
