@@ -30,27 +30,26 @@ public class NotionClient {
 
 	private static final String GET_TASKS_ENDPOINT = "https://www.notion.so/api/v3/getTasks";
 	private static final String ENQUEUE_ENDPOINT = "https://www.notion.so/api/v3/enqueueTask";
-	private static final String LOGIN_ENDPOINT = "https://www.notion.so/api/v3/loginWithEmail";
 	private static final String TOKEN_V2 = "token_v2";
 	private static final String EXPORT_FILE_NAME = "notion-export";
 	private static final String EXPORT_FILE_EXTENSION = ".zip";
 
 	private static final String KEY_DOWNLOADS_DIRECTORY_PATH = "DOWNLOADS_DIRECTORY_PATH";
 	private static final String KEY_NOTION_SPACE_ID = "NOTION_SPACE_ID";
-	private static final String KEY_NOTION_EMAIL = "NOTION_EMAIL";
-	private static final String KEY_NOTION_PASSWORD = "NOTION_PASSWORD";
+	private static final String KEY_NOTION_TOKEN_V2 = "NOTION_TOKEN_V2";
 	private static final String KEY_NOTION_EXPORT_TYPE = "NOTION_EXPORT_TYPE";
 	private static final String KEY_NOTION_FLATTEN_EXPORT_FILETREE = "NOTION_FLATTEN_EXPORT_FILETREE";
+	private static final String KEY_NOTION_EXPORT_COMMENTS = "NOTION_EXPORT_COMMENTS";
 	private static final String DEFAULT_NOTION_EXPORT_TYPE = "markdown";
 	private static final boolean DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE = false;
+	private static final boolean DEFAULT_NOTION_EXPORT_COMMENTS = true;
 	private static final String DEFAULT_DOWNLOADS_PATH = "/downloads";
 
-
 	private final String notionSpaceId;
-	private final String notionEmail;
-	private final String notionPassword;
+	private final String notionTokenV2;
 	private final String exportType;
 	private final boolean flattenExportFiletree;
+	private final boolean exportComments;
 	private String downloadsDirectoryPath;
 
 	private final HttpClient newClient;
@@ -65,8 +64,7 @@ public class NotionClient {
 
 		// both environment variables and variables defined in the .env file can be accessed this way
 		notionSpaceId = dotenv.get(KEY_NOTION_SPACE_ID);
-		notionEmail = dotenv.get(KEY_NOTION_EMAIL);
-		notionPassword = dotenv.get(KEY_NOTION_PASSWORD);
+		notionTokenV2 = dotenv.get(KEY_NOTION_TOKEN_V2);
 		downloadsDirectoryPath = dotenv.get(KEY_DOWNLOADS_DIRECTORY_PATH);
 
 		if (StringUtils.isBlank(downloadsDirectoryPath)) {
@@ -80,11 +78,15 @@ public class NotionClient {
 		flattenExportFiletree = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_FLATTEN_EXPORT_FILETREE)) ?
 				Boolean.parseBoolean(dotenv.get(KEY_NOTION_FLATTEN_EXPORT_FILETREE)) :
 				DEFAULT_NOTION_FLATTEN_EXPORT_FILETREE;
+		exportComments = StringUtils.isNotBlank(dotenv.get(KEY_NOTION_EXPORT_COMMENTS)) ?
+				Boolean.parseBoolean(dotenv.get(KEY_NOTION_EXPORT_COMMENTS)) :
+				DEFAULT_NOTION_EXPORT_COMMENTS;
 
 		exitIfRequiredEnvVariablesNotValid();
 
 		log.info("Using export type: {}", exportType);
 		log.info("Flatten export file tree: {}", flattenExportFiletree);
+		log.info("Export comments: {}", exportComments);
 	}
 
 
@@ -92,28 +94,23 @@ public class NotionClient {
 		if (StringUtils.isBlank(notionSpaceId)) {
 			exit(KEY_NOTION_SPACE_ID + " is missing!");
 		}
-		if (StringUtils.isBlank(notionEmail)) {
-			exit(KEY_NOTION_EMAIL + " is missing!");
-		}
-		if (StringUtils.isBlank(notionPassword)) {
-			exit(KEY_NOTION_PASSWORD + " is missing!");
+		if (StringUtils.isBlank(notionTokenV2)) {
+			exit(KEY_NOTION_TOKEN_V2 + " is missing!");
 		}
 	}
 
 
 	public Optional<File> export() {
 		try {
-			Optional<String> tokenV2 = getTokenV2();
-			if (tokenV2.isEmpty()) {
-				log.info("tokenV2 could not be extracted");
+			Optional<String> taskId = triggerExportTask();
+
+			if (taskId.isEmpty()) {
+				log.info("taskId could not be extracted");
 				return Optional.empty();
 			}
-			log.info("tokenV2 extracted");
-
-			String taskId = triggerExportTask(tokenV2.get());
 			log.info("taskId extracted");
 
-			Optional<String> downloadLink = getDownloadLink(taskId, tokenV2.get());
+			Optional<String> downloadLink = getDownloadLink(taskId.get());
 			if (downloadLink.isEmpty()) {
 				log.info("downloadLink could not be extracted");
 				return Optional.empty();
@@ -164,43 +161,10 @@ public class NotionClient {
 	}
 
 
-	// TODO create gist
-	private Optional<String> getTokenV2() throws IOException, InterruptedException {
-		String credentialsTemplate = "{" +
-				"\"email\": \"%s\"," +
-				"\"password\": \"%s\"" +
-				"}";
-		String credentialsJson = String.format(credentialsTemplate, notionEmail, notionPassword);
-
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(LOGIN_ENDPOINT))
-				.POST(HttpRequest.BodyPublishers.ofString(credentialsJson))
-				.timeout(Duration.ofSeconds(10))
-				.header("Content-Type", "application/json")
-				.build();
-
-		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-		if (response.statusCode() == 429) {
-			log.warn("Too many requests were sent. Notion is returning a 429 status code (Too many requests).");
-			return Optional.empty();
-		}
-
-		return Optional.of(cookieManager.getCookieStore()
-				.get(URI.create(LOGIN_ENDPOINT))
-				.stream()
-				.filter(cookie -> TOKEN_V2.equals(cookie.getName()))
-				.findFirst()
-				.orElseThrow()
-				.getValue());
-
-	}
-
-
-	private String triggerExportTask(String tokenV2) throws IOException, InterruptedException {
+	private Optional<String> triggerExportTask() throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(ENQUEUE_ENDPOINT))
-				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
+				.header("Cookie", TOKEN_V2 + "=" + notionTokenV2)
 				.header("Content-Type", "application/json")
 				.POST(HttpRequest.BodyPublishers.ofString(getTaskJson()))
 				.build();
@@ -208,53 +172,71 @@ public class NotionClient {
 		HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 		JsonNode responseJsonNode = objectMapper.readTree(response.body());
-		return responseJsonNode.get("taskId").asText();
+
+		/*	This will be the response if the given token is not valid anymore (for example if a logout occurred)
+			{
+				"errorId": "<some-UUID>",
+				"name":"UnauthorizedError",
+				"message":"Token was invalid or expired.",
+				"clientData":{"type":"login_try_again"}
+			}
+		 */
+		if (responseJsonNode.get("taskId") == null) {
+			log.error("Error name: {}, error message: {}", responseJsonNode.get("name"), responseJsonNode.get("message"));
+			return Optional.empty();
+		}
+
+		return Optional.of(responseJsonNode.get("taskId").asText());
 	}
 
 
-	private Optional<String> getDownloadLink(String taskId, String tokenV2) throws IOException, InterruptedException {
+	private Optional<String> getDownloadLink(String taskId) throws IOException, InterruptedException {
 		String postBody = String.format("{\"taskIds\": [\"%s\"]}", taskId);
 
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(GET_TASKS_ENDPOINT))
-				.header("Cookie", TOKEN_V2 + "=" + tokenV2)
+				.header("Cookie", TOKEN_V2 + "=" + notionTokenV2)
 				.header("Content-Type", "application/json")
 				.timeout(Duration.ofSeconds(10))
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
-		for (int i = 0; i < 800; i++) {
+		for (int i = 0; i < 8000; i++) {
 			HttpResponse<String> response = newClient.send(request, HttpResponse.BodyHandlers.ofString());
 
 			// TODO Need to prepare Jackson Document and see how this is handled. I don't wan't this wrapper "Results" class
 			Results results = objectMapper.readValue(response.body(), Results.class);
 
-			if (!results.getResults().isEmpty()) {
-				Result result = results.getResults().stream().findFirst().get();
-
-				if (result.getStatus() != null) {
-					log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
-
-					if (StringUtils.isNotBlank(result.getStatus().getExportUrl())) {
-						log.info("Notion response now contains the export url. 'state': '{}', Pages exported so far: {}, Status.type: {}",
-								result.getState(), result.getStatus().getPagesExported(), result.getStatus().getType());
-					}
-				}
-
-				if (result.isSuccess()) {
-					log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
-					return Optional.of(result.getStatus().getExportUrl());
-				}
-
+			if (results.getResults().isEmpty()) {
+				sleep(6000);
+				continue;
 			}
 
-			sleep(6000);
+			Result result = results.getResults().stream().findFirst().get();
+
+			if (result.isFailure()) {
+				log.info("Notion API workspace export returned a 'failure' state. Reason: {}", result.getError());
+				return Optional.empty();
+			}
+
+			if (result.getStatus() != null) {
+				log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
+
+				if (StringUtils.isNotBlank(result.getStatus().getExportUrl())) {
+					log.info("Notion response now contains the export url. 'state': '{}', Pages exported so far: {}, Status.type: {}",
+							result.getState(), result.getStatus().getPagesExported(), result.getStatus().getType());
+				}
+			}
+
+			if (result.isSuccess()) {
+				log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
+				return Optional.of(result.getStatus().getExportUrl());
+			}
 		}
 
 		log.info("Notion workspace export failed. After waiting 80 minutes, the export status from the Notion API response was still not 'success'");
 		return Optional.empty();
 	}
-
 
 	private String getTaskJson() {
 		String taskJsonTemplate = "{" +
@@ -262,6 +244,7 @@ public class NotionClient {
 				"    \"eventName\": \"exportSpace\"," +
 				"    \"request\": {" +
 				"      \"spaceId\": \"%s\"," +
+				"      \"shouldExportComments\": %s," +
 				"      \"exportOptions\": {" +
 				"        \"exportType\": \"%s\"," +
 				"        \"flattenExportFiletree\": %s," +
@@ -271,7 +254,7 @@ public class NotionClient {
 				"    }" +
 				"  }" +
 				"}";
-		return String.format(taskJsonTemplate, notionSpaceId, exportType, flattenExportFiletree);
+		return String.format(taskJsonTemplate, notionSpaceId, exportComments, exportType.toLowerCase(), flattenExportFiletree);
 	}
 
 

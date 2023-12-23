@@ -1,6 +1,9 @@
 FROM openjdk:11
 ARG PATH_TO_JAR
 
+# Automatically links the repository with the container image deployed on GitHub Container Registry
+LABEL org.opencontainers.image.source="https://github.com/jckleiner/notion-backup"
+
 WORKDIR /
 
 RUN mkdir /downloads

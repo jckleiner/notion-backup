@@ -1,4 +1,4 @@
-name: notion-backup-docker-run
+name: Start Notion backup (using docker)
 
 on:
   # adds a "run workflow" button to the page
@@ -14,7 +14,7 @@ jobs:
       - uses: kohlerdominik/docker-run-action@v1
         with:
           # public, private or local image
-          image: jckleiner/notion-backup
+          image: ghcr.io/jckleiner/notion-backup
           # pass or create environment variables
           environment: |
             NOTION_SPACE_ID=${{ secrets.NOTION_SPACE_ID }}
@@ -34,10 +34,13 @@ jobs:
             NEXTCLOUD_EMAIL=${{ secrets.NEXTCLOUD_EMAIL }}
             NEXTCLOUD_PASSWORD=${{ secrets.NEXTCLOUD_PASSWORD }}
             NEXTCLOUD_WEBDAV_URL=${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+            
+            PCLOUD_ACCESS_TOKEN=${{ secrets.PCLOUD_ACCESS_TOKEN }}
+            PCLOUD_API_HOST=${{ secrets.PCLOUD_API_HOST }}
+            PCLOUD_FOLDER_ID=${{ secrets.PCLOUD_FOLDER_ID }}
 
           # run is required: "Error: Input required and not supplied: run"
           run: |
-            echo "hello world"
             uname -a
 
 

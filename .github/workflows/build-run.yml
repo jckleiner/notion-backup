@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
-
-name: notion-backup-build-run
+name: Start Notion backup
 
 on:
   push:
@@ -32,8 +29,7 @@ jobs:
       run: java -jar ./target/notion-backup-1.0-SNAPSHOT.jar
       env:
         NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
-        NOTION_EMAIL: ${{ secrets.NOTION_EMAIL }}
-        NOTION_PASSWORD: ${{ secrets.NOTION_PASSWORD }}
+        NOTION_TOKEN_V2: ${{ secrets.NOTION_TOKEN_V2 }}
 
         GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
         GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
@@ -48,5 +44,9 @@ jobs:
         NEXTCLOUD_EMAIL: ${{ secrets.NEXTCLOUD_EMAIL }}
         NEXTCLOUD_PASSWORD: ${{ secrets.NEXTCLOUD_PASSWORD }}
         NEXTCLOUD_WEBDAV_URL: ${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+
+        PCLOUD_ACCESS_TOKEN: ${{ secrets.PCLOUD_ACCESS_TOKEN }}
+        PCLOUD_API_HOST: ${{ secrets.PCLOUD_API_HOST }}
+        PCLOUD_FOLDER_ID: ${{ secrets.PCLOUD_FOLDER_ID }}
 
         DOWNLOADS_DIRECTORY_PATH: /tmp/
