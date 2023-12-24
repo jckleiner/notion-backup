@@ -73,32 +73,40 @@ public class NotionBackup {
 		CompletableFuture<Void> futureGoogleDrive = CompletableFuture
 				.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile))
 				.handle((result, ex) -> {
-					if (ex != null) { hasErrorOccurred.set(true); }
-					log.error("Exception while GoogleDrive upload", ex);
+					if (ex != null) {
+						log.error("Exception while GoogleDrive upload", ex);
+						hasErrorOccurred.set(true);
+					}
 					return null;
 				});
 
 		CompletableFuture<Void> futureDropbox = CompletableFuture
 				.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile))
 				.handle((result, ex) -> {
-					if (ex != null) { hasErrorOccurred.set(true); }
-					log.error("Exception while Dropbox upload", ex);
+					if (ex != null) {
+						hasErrorOccurred.set(true);
+						log.error("Exception while Dropbox upload", ex);
+					}
 					return null;
 				});
 
 		CompletableFuture<Void> futureNextcloud = CompletableFuture
 				.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile))
 				.handle((result, ex) -> {
-					if (ex != null) { hasErrorOccurred.set(true); }
-					log.error("Exception while Nextcloud upload", ex);
+					if (ex != null) {
+						hasErrorOccurred.set(true);
+						log.error("Exception while Nextcloud upload", ex);
+					}
 					return null;
 				});
 
 		CompletableFuture<Void> futurePCloud = CompletableFuture
 				.runAsync(() -> NotionBackup.startPCloudBackup(exportedFile))
 				.handle((result, ex) -> {
-					if (ex != null) { hasErrorOccurred.set(true); }
-					log.error("Exception while Pcloud upload", ex);
+					if (ex != null) {
+						hasErrorOccurred.set(true);
+						log.error("Exception while Pcloud upload", ex);
+					}
 					return null;
 				});
 
