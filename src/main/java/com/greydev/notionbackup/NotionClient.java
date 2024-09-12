@@ -201,7 +201,7 @@ public class NotionClient {
 				.uri(URI.create(GET_TASKS_ENDPOINT))
 				.header("Cookie", TOKEN_V2 + "=" + notionTokenV2)
 				.header("Content-Type", "application/json")
-				.timeout(Duration.ofSeconds(10))
+				.timeout(Duration.ofSeconds(20))
 				.POST(HttpRequest.BodyPublishers.ofString(postBody))
 				.build();
 
@@ -210,12 +210,12 @@ public class NotionClient {
 
 			Results results = objectMapper.readValue(response.body(), Results.class);
 
-			if (results.getResults().isEmpty()) {
+			if (results == null || results.getResults() == null || results.getResults().isEmpty()) {
 				sleep(6000);
 				continue;
 			}
 
-			Result result = results.getResults().stream().findFirst().get();
+			Result result = results.getResults().get(0);
 
 			if (result.isFailure()) {
 				log.info("Notion API workspace export returned a 'failure' state. Reason: {}", result.getError());
