@@ -30,7 +30,7 @@ jobs:
       env:
         NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
         NOTION_TOKEN_V2: ${{ secrets.NOTION_TOKEN_V2 }}
-        NOTION_EXPORT_TYPE: marksown
+        NOTION_EXPORT_TYPE: markdown
 
         GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
         GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
