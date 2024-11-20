@@ -70,7 +70,7 @@ public class NotionBackup {
 
 		AtomicBoolean hasErrorOccurred = new AtomicBoolean(false);
 
-		CompletableFuture<Void> futureGoogleDrive = CompletableFuture
+		CompletableFuture
 				.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile))
 				.handle((result, ex) -> {
 					if (ex != null) {
@@ -78,7 +78,7 @@ public class NotionBackup {
 						hasErrorOccurred.set(true);
 					}
 					return null;
-				});
+				}).join();
 
 //		CompletableFuture<Void> futureDropbox = CompletableFuture
 //				.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile))
