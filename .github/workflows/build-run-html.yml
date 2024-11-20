@@ -9,7 +9,7 @@ on:
 
   # will be triggered at 04:05 on every 2nd day-of-month from 2 through 30.
   schedule:
-    - cron: '0 4 1-31/5 * *'
+    - cron: '0 4 5-30/5 * *'
 
 jobs:
   build-and-run:
