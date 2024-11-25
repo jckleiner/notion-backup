@@ -1,15 +1,15 @@
-name: Start Notion backup
+name: Start Notion HTML backup
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, gdrive ]
 
   # adds a "run workflow" button to the page
   workflow_dispatch:
 
   # will be triggered at 04:05 on every 2nd day-of-month from 2 through 30.
-#  schedule:
-#    - cron: '5 4 2-30/2 * *'
+  schedule:
+    - cron: '0 4 5-30/5 * *'
 
 jobs:
   build-and-run:
@@ -30,6 +30,7 @@ jobs:
       env:
         NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
         NOTION_TOKEN_V2: ${{ secrets.NOTION_TOKEN_V2 }}
+        NOTION_EXPORT_TYPE: html
 
         GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
         GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}

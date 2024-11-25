@@ -70,7 +70,7 @@ public class NotionBackup {
 
 		AtomicBoolean hasErrorOccurred = new AtomicBoolean(false);
 
-		CompletableFuture<Void> futureGoogleDrive = CompletableFuture
+		CompletableFuture
 				.runAsync(() -> NotionBackup.startGoogleDriveBackup(exportedFile))
 				.handle((result, ex) -> {
 					if (ex != null) {
@@ -78,46 +78,45 @@ public class NotionBackup {
 						hasErrorOccurred.set(true);
 					}
 					return null;
-				});
+				}).join();
 
-		CompletableFuture<Void> futureDropbox = CompletableFuture
-				.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile))
-				.handle((result, ex) -> {
-					if (ex != null) {
-						hasErrorOccurred.set(true);
-						log.error("Exception while Dropbox upload", ex);
-					}
-					return null;
-				});
+//		CompletableFuture<Void> futureDropbox = CompletableFuture
+//				.runAsync(() -> NotionBackup.startDropboxBackup(exportedFile))
+//				.handle((result, ex) -> {
+//					if (ex != null) {
+//						hasErrorOccurred.set(true);
+//						log.error("Exception while Dropbox upload", ex);
+//					}
+//					return null;
+//				});
+//
+//		CompletableFuture<Void> futureNextcloud = CompletableFuture
+//				.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile))
+//				.handle((result, ex) -> {
+//					if (ex != null) {
+//						hasErrorOccurred.set(true);
+//						log.error("Exception while Nextcloud upload", ex);
+//					}
+//					return null;
+//				});
+//
+//		CompletableFuture<Void> futurePCloud = CompletableFuture
+//				.runAsync(() -> NotionBackup.startPCloudBackup(exportedFile))
+//				.handle((result, ex) -> {
+//					if (ex != null) {
+//						hasErrorOccurred.set(true);
+//						log.error("Exception while Pcloud upload", ex);
+//					}
+//					return null;
+//				});
 
-		CompletableFuture<Void> futureNextcloud = CompletableFuture
-				.runAsync(() -> NotionBackup.startNextcloudBackup(exportedFile))
-				.handle((result, ex) -> {
-					if (ex != null) {
-						hasErrorOccurred.set(true);
-						log.error("Exception while Nextcloud upload", ex);
-					}
-					return null;
-				});
-
-		CompletableFuture<Void> futurePCloud = CompletableFuture
-				.runAsync(() -> NotionBackup.startPCloudBackup(exportedFile))
-				.handle((result, ex) -> {
-					if (ex != null) {
-						hasErrorOccurred.set(true);
-						log.error("Exception while Pcloud upload", ex);
-					}
-					return null;
-				});
-
-		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud, futurePCloud).join();
+//		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud, futurePCloud).join();
 
 		if (hasErrorOccurred.get()) {
 			log.error("Not all backups were completed successfully. See the logs above to get more information about the errors.");
 			System.exit(1);
 		}
 	}
-
 
 	public static void startGoogleDriveBackup(File fileToUpload) {
 		Optional<String> serviceAccountSecretOptional = extractGoogleServiceAccountSecret();
@@ -143,107 +142,106 @@ public class NotionBackup {
 		}
 	}
 
-
-	public static void startDropboxBackup(File fileToUpload) {
-		Optional<String> dropboxAccessToken = getDropboxAccessToken();
-		if (dropboxAccessToken.isEmpty()) {
-			log.info("No Dropbox access token available. Skipping Dropbox upload.");
-			return;
-		}
-
-		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken.get());
-		if (dropboxServiceOptional.isEmpty()) {
-			log.warn("Could not create Dropbox service. Skipping Dropbox upload");
-			return;
-		}
-		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
-		boolean isSuccess =  dropboxClient.upload(fileToUpload);
-
-		if (!isSuccess) {
-			throw new IllegalStateException("Backup was not successful");
-		}
-	}
-
-	private static Optional<String> getDropboxAccessToken() {
-		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
-
-		if (StringUtils.isBlank(dropboxAccessToken)) {
-			log.info("{} is blank. Trying to fetch an access token with the refresh token...", KEY_DROPBOX_ACCESS_TOKEN);
-
-			String dropboxAppKey = dotenv.get(KEY_DROPBOX_APP_KEY);
-			String dropboxAppSecret = dotenv.get(KEY_DROPBOX_APP_SECRET);
-			String dropboxRefreshToken = dotenv.get(KEY_DROPBOX_REFRESH_TOKEN);
-			if (StringUtils.isAnyBlank(dropboxAppKey, dropboxAppSecret, dropboxRefreshToken)) {
-				log.info("Failed to fetch an access token. Either {}, {} or {} is blank.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
-				return Optional.empty();
-			}
-
-			DbxCredential dbxCredential = new DbxCredential("", 14400L, dropboxRefreshToken, dropboxAppKey, dropboxAppSecret);
-			DbxRefreshResult refreshResult;
-			try {
-				refreshResult = dbxCredential.refresh(new DbxRequestConfig("NotionBackup"));
-			} catch (DbxException e) {
-				log.info("Token refresh call to Dropbox API failed.");
-				return Optional.empty();
-			}
-
-			dropboxAccessToken = refreshResult.getAccessToken();
-			log.info("Successfully fetched an access token.");
-		}
-
-		return Optional.of(dropboxAccessToken);
-	}
-
-
-	public static void startNextcloudBackup(File fileToUpload) {
-		String email = dotenv.get(KEY_NEXTCLOUD_EMAIL);
-		String password = dotenv.get(KEY_NEXTCLOUD_PASSWORD);
-		String webdavUrl = dotenv.get(KEY_NEXTCLOUD_WEBDAV_URL);
-
-		if (StringUtils.isAnyBlank(email, password, webdavUrl)) {
-			log.info("Skipping Nextcloud upload. {}, {} or {} is blank.", KEY_NEXTCLOUD_EMAIL, KEY_NEXTCLOUD_PASSWORD, KEY_NEXTCLOUD_WEBDAV_URL);
-			return;
-		}
-
-		boolean isSuccess = new NextcloudClient(email, password, webdavUrl).upload(fileToUpload);
-
-		if (!isSuccess) {
-			throw new IllegalStateException("Backup was not successful");
-		}
-	}
-
-	public static void startPCloudBackup(File fileToUpload) {
-		String pCloudAccessToken = dotenv.get(KEY_PCLOUD_ACCESS_TOKEN);
-		String pCloudApiHost = dotenv.get(KEY_PCLOUD_API_HOST);
-
-		if (StringUtils.isAnyBlank(pCloudAccessToken, pCloudApiHost)) {
-			log.info("Skipping pCloud upload. {} or {} is blank.", KEY_PCLOUD_ACCESS_TOKEN, KEY_PCLOUD_API_HOST);
-			return;
-		}
-
-		Optional<ApiClient> pCloudApiClient = PCloudApiClientFactory.create(pCloudAccessToken, pCloudApiHost);
-		if (pCloudApiClient.isEmpty()) {
-			log.info("Could not create pCloud API client. Skipping pCloud upload.");
-			return;
-		}
-
-		String pCloudFolderIdString = dotenv.get(KEY_PCLOUD_FOLDER_ID);
-		long pCloudFolderId = RemoteFolder.ROOT_FOLDER_ID;
-		if (StringUtils.isNotBlank(pCloudFolderIdString)) {
-			try {
-				pCloudFolderId = Long.parseLong(pCloudFolderIdString);
-			} catch (NumberFormatException e) {
-				log.warn("The given pCloud folder ID {} is not a valid number. Skipping pCloud upload.", pCloudFolderIdString);
-				return;
-			}
-		}
-		PCloudClient pCloudClient = new PCloudClient(pCloudApiClient.get(), pCloudFolderId);
-		boolean isSuccess = pCloudClient.upload(fileToUpload);
-
-		if (!isSuccess) {
-			throw new IllegalStateException("Backup was not successful");
-		}
-	}
+//	public static void startDropboxBackup(File fileToUpload) {
+//		Optional<String> dropboxAccessToken = getDropboxAccessToken();
+//		if (dropboxAccessToken.isEmpty()) {
+//			log.info("No Dropbox access token available. Skipping Dropbox upload.");
+//			return;
+//		}
+//
+//		Optional<DbxClientV2> dropboxServiceOptional = DropboxServiceFactory.create(dropboxAccessToken.get());
+//		if (dropboxServiceOptional.isEmpty()) {
+//			log.warn("Could not create Dropbox service. Skipping Dropbox upload");
+//			return;
+//		}
+//		DropboxClient dropboxClient = new DropboxClient(dropboxServiceOptional.get());
+//		boolean isSuccess =  dropboxClient.upload(fileToUpload);
+//
+//		if (!isSuccess) {
+//			throw new IllegalStateException("Backup was not successful");
+//		}
+//	}
+//
+//	private static Optional<String> getDropboxAccessToken() {
+//		String dropboxAccessToken = dotenv.get(KEY_DROPBOX_ACCESS_TOKEN);
+//
+//		if (StringUtils.isBlank(dropboxAccessToken)) {
+//			log.info("{} is blank. Trying to fetch an access token with the refresh token...", KEY_DROPBOX_ACCESS_TOKEN);
+//
+//			String dropboxAppKey = dotenv.get(KEY_DROPBOX_APP_KEY);
+//			String dropboxAppSecret = dotenv.get(KEY_DROPBOX_APP_SECRET);
+//			String dropboxRefreshToken = dotenv.get(KEY_DROPBOX_REFRESH_TOKEN);
+//			if (StringUtils.isAnyBlank(dropboxAppKey, dropboxAppSecret, dropboxRefreshToken)) {
+//				log.info("Failed to fetch an access token. Either {}, {} or {} is blank.", KEY_DROPBOX_REFRESH_TOKEN, KEY_DROPBOX_APP_KEY, KEY_DROPBOX_APP_SECRET);
+//				return Optional.empty();
+//			}
+//
+//			DbxCredential dbxCredential = new DbxCredential("", 14400L, dropboxRefreshToken, dropboxAppKey, dropboxAppSecret);
+//			DbxRefreshResult refreshResult;
+//			try {
+//				refreshResult = dbxCredential.refresh(new DbxRequestConfig("NotionBackup"));
+//			} catch (DbxException e) {
+//				log.info("Token refresh call to Dropbox API failed.");
+//				return Optional.empty();
+//			}
+//
+//			dropboxAccessToken = refreshResult.getAccessToken();
+//			log.info("Successfully fetched an access token.");
+//		}
+//
+//		return Optional.of(dropboxAccessToken);
+//	}
+//
+//
+//	public static void startNextcloudBackup(File fileToUpload) {
+//		String email = dotenv.get(KEY_NEXTCLOUD_EMAIL);
+//		String password = dotenv.get(KEY_NEXTCLOUD_PASSWORD);
+//		String webdavUrl = dotenv.get(KEY_NEXTCLOUD_WEBDAV_URL);
+//
+//		if (StringUtils.isAnyBlank(email, password, webdavUrl)) {
+//			log.info("Skipping Nextcloud upload. {}, {} or {} is blank.", KEY_NEXTCLOUD_EMAIL, KEY_NEXTCLOUD_PASSWORD, KEY_NEXTCLOUD_WEBDAV_URL);
+//			return;
+//		}
+//
+//		boolean isSuccess = new NextcloudClient(email, password, webdavUrl).upload(fileToUpload);
+//
+//		if (!isSuccess) {
+//			throw new IllegalStateException("Backup was not successful");
+//		}
+//	}
+//
+//	public static void startPCloudBackup(File fileToUpload) {
+//		String pCloudAccessToken = dotenv.get(KEY_PCLOUD_ACCESS_TOKEN);
+//		String pCloudApiHost = dotenv.get(KEY_PCLOUD_API_HOST);
+//
+//		if (StringUtils.isAnyBlank(pCloudAccessToken, pCloudApiHost)) {
+//			log.info("Skipping pCloud upload. {} or {} is blank.", KEY_PCLOUD_ACCESS_TOKEN, KEY_PCLOUD_API_HOST);
+//			return;
+//		}
+//
+//		Optional<ApiClient> pCloudApiClient = PCloudApiClientFactory.create(pCloudAccessToken, pCloudApiHost);
+//		if (pCloudApiClient.isEmpty()) {
+//			log.info("Could not create pCloud API client. Skipping pCloud upload.");
+//			return;
+//		}
+//
+//		String pCloudFolderIdString = dotenv.get(KEY_PCLOUD_FOLDER_ID);
+//		long pCloudFolderId = RemoteFolder.ROOT_FOLDER_ID;
+//		if (StringUtils.isNotBlank(pCloudFolderIdString)) {
+//			try {
+//				pCloudFolderId = Long.parseLong(pCloudFolderIdString);
+//			} catch (NumberFormatException e) {
+//				log.warn("The given pCloud folder ID {} is not a valid number. Skipping pCloud upload.", pCloudFolderIdString);
+//				return;
+//			}
+//		}
+//		PCloudClient pCloudClient = new PCloudClient(pCloudApiClient.get(), pCloudFolderId);
+//		boolean isSuccess = pCloudClient.upload(fileToUpload);
+//
+//		if (!isSuccess) {
+//			throw new IllegalStateException("Backup was not successful");
+//		}
+//	}
 
 	private static Optional<String> extractGoogleServiceAccountSecret() {
 		String serviceAccountSecret = dotenv.get(KEY_GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON);
@@ -261,7 +259,6 @@ public class NotionBackup {
 		return Optional.empty();
 	}
 
-
 	private static Optional<String> readFileContentAsString(String filePath) {
 		String fileContent = null;
 		try {
@@ -277,7 +274,6 @@ public class NotionBackup {
 		return Optional.of(fileContent);
 	}
 
-
 	private static Dotenv initDotenv() {
 		Dotenv dotenv = Dotenv.configure()
 				.ignoreIfMissing()
@@ -288,5 +284,4 @@ public class NotionBackup {
 		}
 		return dotenv;
 	}
-
 }
