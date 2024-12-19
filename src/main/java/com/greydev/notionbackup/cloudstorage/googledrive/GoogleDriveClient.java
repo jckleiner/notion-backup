@@ -7,7 +7,7 @@ import com.greydev.notionbackup.cloudstorage.CloudStorageClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -44,7 +44,7 @@ public class GoogleDriveClient implements CloudStorageClient {
         FileContent notionExportFileContent = new FileContent("application/zip", fileToUpload);
         File fileMetadata = new File();
         fileMetadata.setName(fileToUpload.getName());
-        fileMetadata.setParents(getParent());
+        fileMetadata.setParents(Collections.singletonList(getParent()));
 
         try {
             driveService.files().create(fileMetadata, notionExportFileContent)
@@ -59,19 +59,16 @@ public class GoogleDriveClient implements CloudStorageClient {
         return true;
     }
 
-    private List<String> getParent() {
-        ArrayList<String> ids = new ArrayList<>();
-        ids.add(googleDriveRootFolderId);
-
-        List<String> dateBasedFolderIds = createDateBasedFolders();
-        if (!dateBasedFolderIds.isEmpty()) {
-            ids.addAll(dateBasedFolderIds);
+    private String getParent() {
+        String dateBasedFolderIds = createDateBasedFolders();
+        if (dateBasedFolderIds != null) {
+            return dateBasedFolderIds;
         }
 
-        return ids;
+        return googleDriveRootFolderId;
     }
 
-    private List<String> createDateBasedFolders() {
+    private String createDateBasedFolders() {
         String folderName = "Test Folder";
         File fileMetadata = new File();
         fileMetadata.setName(folderName);
@@ -84,13 +81,13 @@ public class GoogleDriveClient implements CloudStorageClient {
                     .execute();
 
             if (folder != null) {
-                return List.of(folder.getId());
+                return folder.getId();
             }
         } catch (IOException e) {
             log.warn("Google Drive: IOException ", e);
         }
 
         log.info("Google Drive: successfully created folder '{}'", folderName);
-        return List.of();
+        return null;
     }
 }
