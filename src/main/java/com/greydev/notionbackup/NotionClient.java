@@ -101,46 +101,47 @@ public class NotionClient {
 
 
 	public Optional<File> export() {
-		try {
-			Optional<String> taskId = triggerExportTask();
-
-			if (taskId.isEmpty()) {
-				log.info("taskId could not be extracted");
-				return Optional.empty();
-			}
-			log.info("taskId extracted");
-
-			Optional<String> downloadLink = getDownloadLink(taskId.get());
-			if (downloadLink.isEmpty()) {
-				log.info("downloadLink could not be extracted");
-				return Optional.empty();
-			}
-			log.info("Download link extracted");
-
-			log.info("Downloading file...");
-			String fileName = String.format("%s-%s%s_%s%s",
-					EXPORT_FILE_NAME,
-					exportType,
-					flattenExportFiletree ? "-flattened" : "",
-					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")),
-					EXPORT_FILE_EXTENSION);
-
-			log.info("Downloaded export will be saved to: " + downloadsDirectoryPath);
-			log.info("fileName: " + fileName);
-			Path downloadPath = Path.of(downloadsDirectoryPath, fileName);
-			Optional<File> downloadedFile = downloadToFile(downloadLink.get(), downloadPath);
-
-			if (downloadedFile.isEmpty() || !downloadedFile.get().isFile()) {
-				log.info("Could not download file");
-				return Optional.empty();
-			}
-
-			log.info("Download finished: {}", downloadedFile.get().getName());
-			return downloadedFile;
-		} catch (IOException | InterruptedException e) {
-			log.warn("Exception during export", e);
-		}
-		return Optional.empty();
+		return Optional.of(new File(downloadsDirectoryPath));
+//		try {
+//			Optional<String> taskId = triggerExportTask();
+//
+//			if (taskId.isEmpty()) {
+//				log.info("taskId could not be extracted");
+//				return Optional.empty();
+//			}
+//			log.info("taskId extracted");
+//
+//			Optional<String> downloadLink = getDownloadLink(taskId.get());
+//			if (downloadLink.isEmpty()) {
+//				log.info("downloadLink could not be extracted");
+//				return Optional.empty();
+//			}
+//			log.info("Download link extracted");
+//
+//			log.info("Downloading file...");
+//			String fileName = String.format("%s-%s%s_%s%s",
+//					EXPORT_FILE_NAME,
+//					exportType,
+//					flattenExportFiletree ? "-flattened" : "",
+//					LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")),
+//					EXPORT_FILE_EXTENSION);
+//
+//			log.info("Downloaded export will be saved to: " + downloadsDirectoryPath);
+//			log.info("fileName: " + fileName);
+//			Path downloadPath = Path.of(downloadsDirectoryPath, fileName);
+//			Optional<File> downloadedFile = downloadToFile(downloadLink.get(), downloadPath);
+//
+//			if (downloadedFile.isEmpty() || !downloadedFile.get().isFile()) {
+//				log.info("Could not download file");
+//				return Optional.empty();
+//			}
+//
+//			log.info("Download finished: {}", downloadedFile.get().getName());
+//			return downloadedFile;
+//		} catch (IOException | InterruptedException e) {
+//			log.warn("Exception during export", e);
+//		}
+//		return Optional.empty();
 	}
 
 
