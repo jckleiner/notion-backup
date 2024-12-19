@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -54,8 +54,8 @@ public class NotionBackup {
 //		final File exportedFile = notionClient.export()
 //				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
 
-        Files.write(Paths.get(dotenv.get("DOWNLOADS_DIRECTORY_PATH")), List.of("Line"), StandardCharsets.UTF_8);
-        final File exportedFile = new File(dotenv.get("DOWNLOADS_DIRECTORY_PATH"));
+        Files.write(Path.of(dotenv.get("DOWNLOADS_DIRECTORY_PATH"), "file.txt"), List.of("Line"), StandardCharsets.UTF_8);
+        final File exportedFile = new File(dotenv.get("DOWNLOADS_DIRECTORY_PATH") + "file.txt");
 
         // use a local file to skip the notion export step
         // final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");

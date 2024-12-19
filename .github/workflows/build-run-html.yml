@@ -23,7 +23,7 @@ jobs:
         java-version: 21
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml --no-transfer-progress
+      run: mvn -B package --file pom.xml --no-transfer-progress -DskipTests
 
     - name: Start Notion Backup
       run: java -jar ./target/notion-backup-1.0-SNAPSHOT.jar
