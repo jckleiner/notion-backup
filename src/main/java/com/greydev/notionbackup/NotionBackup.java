@@ -62,8 +62,10 @@ public class NotionBackup {
 
 		NotionClient notionClient = new NotionClient(dotenv);
 
-		final File exportedFile = notionClient.export()
-				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
+//		final File exportedFile = notionClient.export()
+//				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
+
+		final File exportedFile = new File(dotenv.get("DOWNLOADS_DIRECTORY_PATH"));
 
 		// use a local file to skip the notion export step
 		// final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");
