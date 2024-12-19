@@ -3,10 +3,12 @@ package com.greydev.notionbackup.cloudstorage.googledrive;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.greydev.notionbackup.cloudstorage.CloudStorageClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,7 +20,6 @@ public class GoogleDriveClient implements CloudStorageClient {
 
     private final Drive driveService;
     private final String googleDriveRootFolderId;
-
 
     public GoogleDriveClient(Drive driveService, String googleDriveRootFolderId) {
         this.driveService = driveService;
@@ -59,7 +60,7 @@ public class GoogleDriveClient implements CloudStorageClient {
         return true;
     }
 
-    private String getParent() {
+    String getParent() {
         String dateBasedFolderIds = createDateBasedFolders();
         if (dateBasedFolderIds != null) {
             return dateBasedFolderIds;
@@ -68,20 +69,21 @@ public class GoogleDriveClient implements CloudStorageClient {
         return googleDriveRootFolderId;
     }
 
-    private String createDateBasedFolders() {
+    String createDateBasedFolders() {
         String folderName = "Test Folder";
         String folderId = createFolder(folderName, googleDriveRootFolderId);
 
         return folderId != null ? folderId : googleDriveRootFolderId;
     }
 
-    private String createFolder(String name, String parentId) {
+    String createFolder(String name, String parentId) {
         File fileMetadata = new File();
         fileMetadata.setName(name);
         fileMetadata.setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER);
         fileMetadata.setParents(List.of(parentId));
 
         try {
+            findFiles();
             return driveService.files().create(fileMetadata)
                     .setFields("id")
                     .execute()
@@ -91,5 +93,33 @@ public class GoogleDriveClient implements CloudStorageClient {
         }
 
         return null;
+    }
+
+    List<File> findFiles() throws IOException {
+        List<File> files = new ArrayList<>();
+
+        String pageToken = null;
+        do {
+            String query = "mimeType = 'application/vnd.google-apps.folder' and '" + googleDriveRootFolderId + "' in parents";
+            FileList result = driveService.files().list()
+                    .setQ(query)
+                    .setSpaces("drive")
+                    .setFields("nextPageToken, items(id, title)")
+                    .setPageToken(pageToken)
+                    .execute();
+
+            if (result == null) continue;
+
+            for (File file : result.getFiles()) {
+                System.out.printf("Found file: %s (%s)\n",
+                        file.getName(), file.getId());
+            }
+
+            files.addAll(result.getFiles());
+
+            pageToken = result.getNextPageToken();
+        } while (pageToken != null);
+
+        return files;
     }
 }
