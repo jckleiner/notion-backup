@@ -28,7 +28,6 @@ class GoogleDriveClientTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Drive googleDriveService;
 
-
     @Test
     public void testUpload() throws IOException {
         // given
@@ -60,7 +59,6 @@ class GoogleDriveClientTest {
         verify(googleDriveService.files().create(eq(fileMetadata), any(FileContent.class)).setFields("id, parents")).execute();
     }
 
-
     @Test
     public void testUpload_IOException() throws IOException {
         // given
@@ -72,7 +70,8 @@ class GoogleDriveClientTest {
         fileMetadata.setName("testFileToUpload.txt");
         fileMetadata.setParents(Collections.singletonList("parentFolderId"));
 
-        when(googleDriveService.files().create(any())).thenThrow(IOException.class);
+        when(googleDriveService.files().create(any(), any())).thenThrow(IOException.class);
+        when(googleDriveService.files().create(any()).setFields(anyString()).execute()).thenReturn(null);
         clearInvocations(googleDriveService);
 
         // when
@@ -83,7 +82,6 @@ class GoogleDriveClientTest {
         verify(googleDriveService).files();
         verify(googleDriveService.files()).create(eq(fileMetadata), any(FileContent.class));
     }
-
 
     @Test
     public void testUpload_invalidFile() {
@@ -99,5 +97,4 @@ class GoogleDriveClientTest {
         assertFalse(result);
         verifyNoInteractions(googleDriveService);
     }
-
 }
