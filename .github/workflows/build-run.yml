@@ -2,7 +2,7 @@ name: Start Notion backup
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
   # adds a "run workflow" button to the page
   workflow_dispatch:

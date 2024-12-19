@@ -2,7 +2,7 @@ name: Start Notion HTML backup
 
 on:
   push:
-    branches: [ master, gdrive ]
+    branches: [ main, gdrive-folders ]
 
   # adds a "run workflow" button to the page
   workflow_dispatch:
