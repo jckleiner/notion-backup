@@ -74,14 +74,14 @@ class GoogleDriveClientTest {
 
         // then
         assertTrue(result);
-        verify(googleDriveService, times(3)).files();
+        verify(googleDriveService, times(5)).files();
         // eq(notionExportFileContent) does not work I assume because FileContent doesn't override the equals method?
         // com.google.api.client.http.FileContent@66908383 is not the same as com.google.api.client.http.FileContent@736ac09a
         // but eq() works for com.google.api.services.drive.model.File -> the toString {"name" = "testFileToUpload.txt", "parents" = [parentFolderId]}
 
-        verify(googleDriveService.files()).create(any(com.google.api.services.drive.model.File.class));
-        verify(googleDriveService.files().create(any(com.google.api.services.drive.model.File.class))).setFields("id");
-        verify(googleDriveService.files().create(any(com.google.api.services.drive.model.File.class)).setFields("id")).execute();
+        verify(googleDriveService.files(), times(2)).create(any(com.google.api.services.drive.model.File.class));
+        verify(googleDriveService.files().create(any(com.google.api.services.drive.model.File.class)), times(2)).setFields("id");
+        verify(googleDriveService.files().create(any(com.google.api.services.drive.model.File.class)).setFields("id"), times(2)).execute();
         verify(googleDriveService.files()).create(eq(fileMetadata), any(FileContent.class));
         verify(googleDriveService.files().create(eq(fileMetadata), any(FileContent.class))).setFields("id, parents");
         verify(googleDriveService.files().create(eq(fileMetadata), any(FileContent.class)).setFields("id, parents")).execute();
@@ -106,8 +106,8 @@ class GoogleDriveClientTest {
 
         // then
         assertFalse(result);
-        verify(googleDriveService, times(3)).files();
-        verify(googleDriveService.files()).create(any(com.google.api.services.drive.model.File.class));
+        verify(googleDriveService, times(5)).files();
+        verify(googleDriveService.files(), times(2)).create(any(com.google.api.services.drive.model.File.class));
         verify(googleDriveService.files()).create(eq(fileMetadata), any(FileContent.class));
     }
 

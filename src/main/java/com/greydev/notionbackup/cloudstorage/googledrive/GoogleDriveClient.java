@@ -8,6 +8,7 @@ import com.greydev.notionbackup.cloudstorage.CloudStorageClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,10 +45,10 @@ public class GoogleDriveClient implements CloudStorageClient {
 
         FileContent notionExportFileContent = new FileContent("application/zip", fileToUpload);
         File fileMetadata = new File();
-        fileMetadata.setName(fileToUpload.getName());
-        fileMetadata.setParents(Collections.singletonList(getParent()));
 
         try {
+            fileMetadata.setName(fileToUpload.getName());
+            fileMetadata.setParents(Collections.singletonList(createDateBasedFolders()));
             driveService.files().create(fileMetadata, notionExportFileContent)
                     .setFields("id, parents")
                     .execute();
@@ -60,65 +61,74 @@ public class GoogleDriveClient implements CloudStorageClient {
         return true;
     }
 
-    String getParent() {
-        String dateBasedFolderIds = createDateBasedFolders();
-        if (dateBasedFolderIds != null) {
-            return dateBasedFolderIds;
-        }
+    String createDateBasedFolders() throws IOException {
+        LocalDate now = LocalDate.now();
 
-        return googleDriveRootFolderId;
+        String yearFolderId = getYearFolder(now.getYear());
+
+        return getMonthFolder(yearFolderId, now.getMonthValue());
     }
 
-    String createDateBasedFolders() {
-        String folderName = "Test Folder";
-        String folderId = createFolder(folderName, googleDriveRootFolderId);
-
-        return folderId != null ? folderId : googleDriveRootFolderId;
-    }
-
-    String createFolder(String name, String parentId) {
+    String createFolder(String name, String parentId) throws IOException {
         File fileMetadata = new File();
         fileMetadata.setName(name);
         fileMetadata.setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER);
         fileMetadata.setParents(List.of(parentId));
 
-        try {
-            findFiles();
-            return driveService.files().create(fileMetadata)
-                    .setFields("id")
-                    .execute()
-                    .getId();
-        } catch (IOException e) {
-            log.warn("Google Drive: IOException ", e);
-        }
-
-        return null;
+        return driveService.files().create(fileMetadata)
+                .setFields("id")
+                .execute()
+                .getId();
     }
 
-    List<File> findFiles() throws IOException {
+    String getMonthFolder(final String yearFolder, final int month) throws IOException {
+        List<File> folders = findFolders(yearFolder, month);
+
+        if (folders.isEmpty()) {
+            return createFolder(String.valueOf(month), yearFolder);
+        }
+
+        return folders.getFirst().getId();
+    }
+
+    String getYearFolder(final int year) throws IOException {
+        List<File> folders = findFolders(googleDriveRootFolderId, year);
+
+        if (folders.isEmpty()) {
+            return createFolder(String.valueOf(year), googleDriveRootFolderId);
+        }
+
+        return folders.getFirst().getId();
+    }
+
+    List<File> findFolders(final String parentId, final int folderName) {
         List<File> files = new ArrayList<>();
 
         String pageToken = null;
-        do {
-            String query = "mimeType = 'application/vnd.google-apps.folder' and '" + googleDriveRootFolderId + "' in parents";
-            FileList result = driveService.files().list()
-                    .setQ(query)
-                    .setSpaces("drive")
-                    .setFields("nextPageToken,files(id,name)")
-                    .setPageToken(pageToken)
-                    .execute();
+        final String query = String.format("mimeType='application/vnd.google-apps.folder' and name='%d' and '%s' in parents", folderName, parentId);
+        try {
+            do {
+                final FileList result = driveService.files().list()
+                        .setQ(query)
+                        .setSpaces("drive")
+                        .setFields("nextPageToken,files(id,name)")
+                        .setPageToken(pageToken)
+                        .execute();
 
-            if (result == null) continue;
+                if (result == null) continue;
 
-            for (File file : result.getFiles()) {
-                System.out.printf("Found file: %s (%s)\n",
-                        file.getName(), file.getId());
-            }
+                for (File file : result.getFiles()) {
+                    System.out.printf("Found file: %s (%s)\n",
+                            file.getName(), file.getId());
+                }
 
-            files.addAll(result.getFiles());
+                files.addAll(result.getFiles());
 
-            pageToken = result.getNextPageToken();
-        } while (pageToken != null);
+                pageToken = result.getNextPageToken();
+            } while (pageToken != null);
+        } catch (IOException e) {
+            log.warn("Google Drive list: IOException ", e);
+        }
 
         return files;
     }

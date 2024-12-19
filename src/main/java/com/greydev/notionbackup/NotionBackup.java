@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -54,8 +55,9 @@ public class NotionBackup {
 //		final File exportedFile = notionClient.export()
 //				.orElseThrow(() -> new IllegalStateException("Could not export notion file"));
 
-        Files.write(Path.of(dotenv.get("DOWNLOADS_DIRECTORY_PATH"), "file.txt"), List.of("Line"), StandardCharsets.UTF_8);
-        final File exportedFile = new File(dotenv.get("DOWNLOADS_DIRECTORY_PATH") + "file.txt");
+        String name = LocalDateTime.now().toLocalTime().toString();
+        Files.write(Path.of(dotenv.get("DOWNLOADS_DIRECTORY_PATH"), name), List.of("Line"), StandardCharsets.UTF_8);
+        final File exportedFile = new File(dotenv.get("DOWNLOADS_DIRECTORY_PATH") + name);
 
         // use a local file to skip the notion export step
         // final File exportedFile = new File("notion-export-markdown_2022-01-18_23-17-13.zip");
