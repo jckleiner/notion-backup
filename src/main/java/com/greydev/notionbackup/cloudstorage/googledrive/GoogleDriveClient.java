@@ -82,7 +82,10 @@ public class GoogleDriveClient implements CloudStorageClient {
             File folder = driveService.files().create(fileMetadata)
                     .setFields("id")
                     .execute();
-            return List.of(folder.getId());
+
+            if (folder != null) {
+                return List.of(folder.getId());
+            }
         } catch (IOException e) {
             log.warn("Google Drive: IOException ", e);
         }
