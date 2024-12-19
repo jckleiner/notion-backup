@@ -2,7 +2,7 @@ name: Start Notion Markdown backup
 
 on:
   push:
-    branches: [ main, gdrive-folders ]
+    branches: [ main ]
 
   # adds a "run workflow" button to the page
   workflow_dispatch:

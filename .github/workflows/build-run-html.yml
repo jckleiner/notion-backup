@@ -25,29 +25,29 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml --no-transfer-progress
 
-    - name: Start Notion Backup
-      run: java -jar ./target/notion-backup-1.0-SNAPSHOT.jar
-      env:
-        NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
-        NOTION_TOKEN_V2: ${{ secrets.NOTION_TOKEN_V2 }}
-        NOTION_EXPORT_TYPE: html
-
-        GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
-        GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
-        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
-        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH }}
-        
-        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-        DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
-        DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
-        DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
-
-        NEXTCLOUD_EMAIL: ${{ secrets.NEXTCLOUD_EMAIL }}
-        NEXTCLOUD_PASSWORD: ${{ secrets.NEXTCLOUD_PASSWORD }}
-        NEXTCLOUD_WEBDAV_URL: ${{ secrets.NEXTCLOUD_WEBDAV_URL }}
-
-        PCLOUD_ACCESS_TOKEN: ${{ secrets.PCLOUD_ACCESS_TOKEN }}
-        PCLOUD_API_HOST: ${{ secrets.PCLOUD_API_HOST }}
-        PCLOUD_FOLDER_ID: ${{ secrets.PCLOUD_FOLDER_ID }}
-
-        DOWNLOADS_DIRECTORY_PATH: /tmp/
+#    - name: Start Notion Backup
+#      run: java -jar ./target/notion-backup-1.0-SNAPSHOT.jar
+#      env:
+#        NOTION_SPACE_ID: ${{ secrets.NOTION_SPACE_ID }}
+#        NOTION_TOKEN_V2: ${{ secrets.NOTION_TOKEN_V2 }}
+#        NOTION_EXPORT_TYPE: html
+#
+#        GOOGLE_DRIVE_ROOT_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_ROOT_FOLDER_ID }}
+#        GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
+#        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_JSON }}
+#        GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT_SECRET_FILE_PATH }}
+#
+#        DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+#        DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
+#        DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
+#        DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
+#
+#        NEXTCLOUD_EMAIL: ${{ secrets.NEXTCLOUD_EMAIL }}
+#        NEXTCLOUD_PASSWORD: ${{ secrets.NEXTCLOUD_PASSWORD }}
+#        NEXTCLOUD_WEBDAV_URL: ${{ secrets.NEXTCLOUD_WEBDAV_URL }}
+#
+#        PCLOUD_ACCESS_TOKEN: ${{ secrets.PCLOUD_ACCESS_TOKEN }}
+#        PCLOUD_API_HOST: ${{ secrets.PCLOUD_API_HOST }}
+#        PCLOUD_FOLDER_ID: ${{ secrets.PCLOUD_FOLDER_ID }}
+#
+#        DOWNLOADS_DIRECTORY_PATH: /tmp/

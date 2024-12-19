@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM openjdk:21
 ARG PATH_TO_JAR
 
 # Automatically links the repository with the container image deployed on GitHub Container Registry
