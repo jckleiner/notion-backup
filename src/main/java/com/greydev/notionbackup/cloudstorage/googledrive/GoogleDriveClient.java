@@ -70,24 +70,26 @@ public class GoogleDriveClient implements CloudStorageClient {
 
     private String createDateBasedFolders() {
         String folderName = "Test Folder";
+        String folderId = createFolder(folderName, googleDriveRootFolderId);
+
+        return folderId != null ? folderId : googleDriveRootFolderId;
+    }
+
+    private String createFolder(String name, String parentId) {
         File fileMetadata = new File();
-        fileMetadata.setName(folderName);
+        fileMetadata.setName(name);
         fileMetadata.setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER);
-        fileMetadata.setParents(List.of(googleDriveRootFolderId));
+        fileMetadata.setParents(List.of(parentId));
 
         try {
-            File folder = driveService.files().create(fileMetadata)
+            return driveService.files().create(fileMetadata)
                     .setFields("id")
-                    .execute();
-
-            if (folder != null) {
-                return folder.getId();
-            }
+                    .execute()
+                    .getId();
         } catch (IOException e) {
             log.warn("Google Drive: IOException ", e);
         }
 
-        log.info("Google Drive: successfully created folder '{}'", folderName);
         return null;
     }
 }

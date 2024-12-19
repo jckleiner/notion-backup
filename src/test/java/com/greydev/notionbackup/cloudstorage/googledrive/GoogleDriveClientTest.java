@@ -43,7 +43,7 @@ class GoogleDriveClientTest {
         FileContent notionExportFileContent = new FileContent("application/zip", fileToUpload);
 
         when(googleDriveService.files().create(any(), any()).setFields(anyString()).execute()).thenReturn(null);
-        when(googleDriveService.files().create(any()).setFields(anyString()).execute()).thenReturn(null);
+        when(googleDriveService.files().create(any()).setFields(anyString()).execute().getId()).thenReturn("id");
         clearInvocations(googleDriveService);
 
         // when
@@ -76,7 +76,7 @@ class GoogleDriveClientTest {
         fileMetadata.setParents(Collections.singletonList("parentFolderId"));
 
         when(googleDriveService.files().create(any(), any())).thenThrow(IOException.class);
-        when(googleDriveService.files().create(any()).setFields(anyString()).execute()).thenReturn(null);
+        when(googleDriveService.files().create(any()).setFields(anyString()).execute().getId()).thenReturn("id");
         clearInvocations(googleDriveService);
 
         // when
