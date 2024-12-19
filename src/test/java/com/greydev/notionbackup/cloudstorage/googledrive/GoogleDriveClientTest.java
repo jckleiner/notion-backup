@@ -2,6 +2,7 @@ package com.greydev.notionbackup.cloudstorage.googledrive;
 
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -26,24 +27,46 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class GoogleDriveClientTest {
 
+    public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
+    public static final String TEST_FILE = "testFileToUpload.txt";
+    public static final String TEST_FOLDER = "testFolder";
+    public static final String PARENT_FOLDER_ID = "parentFolderId";
+    public static final String TEST_FOLDER_ID = "testFolderId";
+    public static final String ROOT_FOLDER_ID = "parentFolderId";
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Drive googleDriveService;
+
+    private com.google.api.services.drive.model.File responseFile;
+    private com.google.api.services.drive.model.File responseFolder;
+
+    @BeforeEach
+    void setup() {
+        responseFile = new com.google.api.services.drive.model.File();
+        responseFile.setName(TEST_FILE);
+        responseFile.setParents(Collections.singletonList(PARENT_FOLDER_ID));
+
+        responseFolder = new com.google.api.services.drive.model.File();
+        responseFolder.setName(TEST_FOLDER);
+        responseFolder.setParents(Collections.singletonList(PARENT_FOLDER_ID));
+        responseFolder.setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER);
+        responseFolder.setId(TEST_FOLDER_ID);
+    }
 
     @Test
     public void testUpload() throws IOException {
         // given
         File fileToUpload = new File("src/test/resources/testFileToUpload.txt");
-        String googleDriveRootFolderId = "parentFolderId";
-        GoogleDriveClient googleService = new GoogleDriveClient(googleDriveService, googleDriveRootFolderId);
+        GoogleDriveClient googleService = new GoogleDriveClient(googleDriveService, ROOT_FOLDER_ID);
 
         com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
-        fileMetadata.setName("testFileToUpload.txt");
-        fileMetadata.setParents(Collections.singletonList("parentFolderId"));
+        fileMetadata.setName(TEST_FILE);
+        fileMetadata.setParents(Collections.singletonList(TEST_FOLDER_ID));
 
         FileContent notionExportFileContent = new FileContent("application/zip", fileToUpload);
 
-        when(googleDriveService.files().create(any(), any()).setFields(anyString()).execute()).thenReturn(null);
-        when(googleDriveService.files().create(any()).setFields(anyString()).execute().getId()).thenReturn("id");
+        when(googleDriveService.files().create(any(), any()).setFields(anyString()).execute()).thenReturn(responseFile);
+        when(googleDriveService.files().create(any()).setFields(anyString()).execute()).thenReturn(responseFolder);
         clearInvocations(googleDriveService);
 
         // when
@@ -68,15 +91,14 @@ class GoogleDriveClientTest {
     public void testUpload_IOException() throws IOException {
         // given
         File fileToUpload = new File("src/test/resources/testFileToUpload.txt");
-        String googleDriveRootFolderId = "parentFolderId";
-        GoogleDriveClient googleService = new GoogleDriveClient(googleDriveService, googleDriveRootFolderId);
+        GoogleDriveClient googleService = new GoogleDriveClient(googleDriveService, ROOT_FOLDER_ID);
 
         com.google.api.services.drive.model.File fileMetadata = new com.google.api.services.drive.model.File();
-        fileMetadata.setName("testFileToUpload.txt");
-        fileMetadata.setParents(Collections.singletonList("parentFolderId"));
+        fileMetadata.setName(TEST_FILE);
+        fileMetadata.setParents(Collections.singletonList(TEST_FOLDER_ID));
 
         when(googleDriveService.files().create(any(), any())).thenThrow(IOException.class);
-        when(googleDriveService.files().create(any()).setFields(anyString()).execute().getId()).thenReturn("id");
+        when(googleDriveService.files().create(any()).setFields(anyString()).execute()).thenReturn(responseFolder);
         clearInvocations(googleDriveService);
 
         // when
@@ -93,8 +115,7 @@ class GoogleDriveClientTest {
     public void testUpload_invalidFile() {
         // given
         File fileToUpload = new File("thisFileDoesNotExist.txt");
-        String googleDriveRootFolderId = "parentFolderId";
-        GoogleDriveClient googleService = new GoogleDriveClient(googleDriveService, googleDriveRootFolderId);
+        GoogleDriveClient googleService = new GoogleDriveClient(googleDriveService, PARENT_FOLDER_ID);
 
         // when
         boolean result = googleService.upload(fileToUpload);
