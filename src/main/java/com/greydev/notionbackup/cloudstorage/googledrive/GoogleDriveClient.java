@@ -104,7 +104,7 @@ public class GoogleDriveClient implements CloudStorageClient {
             FileList result = driveService.files().list()
                     .setQ(query)
                     .setSpaces("drive")
-                    .setFields("nextPageToken,files(id,title)")
+                    .setFields("nextPageToken,files(id,name)")
                     .setPageToken(pageToken)
                     .execute();
 
