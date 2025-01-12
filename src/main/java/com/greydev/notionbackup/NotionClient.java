@@ -232,8 +232,12 @@ public class NotionClient {
 			}
 
 			if (result.isSuccess()) {
-				log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
-				return Optional.of(result.getStatus().getExportUrl());
+				if (result.getStatus() == null) {
+					log.info("result.isSuccess() is 'true' but result.getStatus() is still 'null'. Waiting one more iteration...");
+				} else {
+					log.info("Notion API workspace export 'state': '{}', Pages exported so far: {}", result.getState(), result.getStatus().getPagesExported());
+					return Optional.of(result.getStatus().getExportUrl());
+				}
 			}
 		sleep(6000);
 		}
