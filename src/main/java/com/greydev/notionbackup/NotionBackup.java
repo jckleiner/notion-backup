@@ -29,6 +29,9 @@ import com.greydev.notionbackup.cloudstorage.nextcloud.NextcloudClient;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
+import com.amazonaws.services.s3.AmazonS3;
+import com.greydev.notionbackup.cloudstorage.aws.S3Client;
+import com.greydev.notionbackup.cloudstorage.aws.S3ServiceFactory;
 
 
 @Slf4j
@@ -50,6 +53,11 @@ public class NotionBackup {
 	private static final String KEY_PCLOUD_ACCESS_TOKEN = "PCLOUD_ACCESS_TOKEN";
 	private static final String KEY_PCLOUD_API_HOST = "PCLOUD_API_HOST";
 	private static final String KEY_PCLOUD_FOLDER_ID = "PCLOUD_FOLDER_ID";
+
+	private static final String KEY_AWS_ACCESS_KEY = "AWS_ACCESS_KEY";
+	private static final String KEY_AWS_SECRET_KEY = "AWS_SECRET_KEY";
+	private static final String KEY_AWS_REGION = "AWS_REGION";
+	private static final String KEY_AWS_BUCKET_NAME = "AWS_BUCKET_NAME";
 
 	private static final Dotenv dotenv;
 
@@ -110,7 +118,17 @@ public class NotionBackup {
 					return null;
 				});
 
-		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud, futurePCloud).join();
+		CompletableFuture<Void> futureS3 = CompletableFuture
+				.runAsync(() -> NotionBackup.startS3Backup(exportedFile))
+				.handle((result, ex) -> {
+					if (ex != null) {
+						hasErrorOccurred.set(true);
+						log.error("Exception while S3 upload", ex);
+					}
+					return null;
+				});
+
+		CompletableFuture.allOf(futureGoogleDrive, futureDropbox, futureNextcloud, futurePCloud, futureS3).join();
 
 		if (hasErrorOccurred.get()) {
 			log.error("Not all backups were completed successfully. See the logs above to get more information about the errors.");
@@ -239,6 +257,32 @@ public class NotionBackup {
 		}
 		PCloudClient pCloudClient = new PCloudClient(pCloudApiClient.get(), pCloudFolderId);
 		boolean isSuccess = pCloudClient.upload(fileToUpload);
+
+		if (!isSuccess) {
+			throw new IllegalStateException("Backup was not successful");
+		}
+	}
+
+	public static void startS3Backup(File fileToUpload) {
+		String accessKey = dotenv.get(KEY_AWS_ACCESS_KEY);
+		String secretKey = dotenv.get(KEY_AWS_SECRET_KEY);
+		String region = dotenv.get(KEY_AWS_REGION);
+		String bucketName = dotenv.get(KEY_AWS_BUCKET_NAME);
+
+		if (StringUtils.isAnyBlank(accessKey, secretKey, region, bucketName)) {
+			log.info("Skipping S3 upload. {}, {}, {} or {} is blank.", 
+				KEY_AWS_ACCESS_KEY, KEY_AWS_SECRET_KEY, KEY_AWS_REGION, KEY_AWS_BUCKET_NAME);
+			return;
+		}
+
+		Optional<AmazonS3> s3Client = S3ServiceFactory.create(accessKey, secretKey, region);
+		if (s3Client.isEmpty()) {
+			log.warn("Could not create S3 client. Skipping S3 upload.");
+			return;
+		}
+
+		S3Client client = new S3Client(s3Client.get(), bucketName);
+		boolean isSuccess = client.upload(fileToUpload);
 
 		if (!isSuccess) {
 			throw new IllegalStateException("Backup was not successful");
