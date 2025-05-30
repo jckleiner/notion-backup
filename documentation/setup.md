@@ -143,3 +143,26 @@ Otherwise, if you want to upload files to a specific folder, do the following st
 3. Navigate to the exact folder where you want the files to be uploaded.
 4. Look at the URL bar of your browser and copy the value of the `folder=<FOLDER_ID>` parameter 
    into the `PCLOUD_FOLDER_ID` environment variable.
+
+### AWS S3
+
+1. Create an AWS account if you don't have one already
+2. Create an S3 bucket where you want to store your Notion backups
+3. Create an IAM user with programmatic access:
+   - Go to the [IAM Console](https://console.aws.amazon.com/iam/)
+   - Click on "Users" and then "Add user"
+   - Give the user a name (e.g., "notion-backup")
+   - Select "Access key - Programmatic access"
+   - Click "Next: Permissions"
+   - Click "Attach existing policies directly"
+   - Search for and select `AmazonS3FullAccess` (or create a more restricted policy if desired)
+   - Complete the user creation process
+4. After creating the user, you'll see the access key and secret key. Add these to your `.env` file:
+   ```
+   AWS_ACCESS_KEY=your_access_key
+   AWS_SECRET_KEY=your_secret_key
+   AWS_REGION=your_region (e.g., us-east-1)
+   AWS_BUCKET_NAME=your_bucket_name
+   ```
+
+Note: Make sure your S3 bucket exists before running the application. The application will create a new file in the bucket with the same name as the exported Notion file.
