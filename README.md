@@ -5,7 +5,7 @@
 > ⚠️ Notion changed their API around 12.2022 which broke the automatic login requests made by this tool to extract the 
 > `token_v2`.
 > 
-> To solve this new limitation, you need to copy the value of the `token_v2` cookie manually (see [How do I find 
+> To solve this new limitation, you need to copy the value of the `token_v2` and `file_token` cookie manually (see [How do I find 
 > all these values?](./documentation/setup.md) for more info).
 
 
@@ -20,6 +20,7 @@ Create a `.env` file with the following properties ([How do I find all these val
     # Notion (Required)
     NOTION_SPACE_ID=
     NOTION_TOKEN_V2=
+    NOTION_FILE_TOKEN=
     # Options: markdown, html (default is markdown)
     NOTION_EXPORT_TYPE=markdown
     # Create folders for nested pages? Options: true, false (default is false)
