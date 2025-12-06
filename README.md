@@ -1,3 +1,6 @@
+> [!CAUTION]
+> # Not maintained anymore
+
 # notion-backup
 
 ![example workflow name](https://github.com/jckleiner/notion-backup/actions/workflows/build-run.yml/badge.svg?branch=master)
