@@ -1,15 +1,19 @@
-FROM openjdk:11
-ARG PATH_TO_JAR
+FROM maven:3.9.10-eclipse-temurin-11
 
 # Automatically links the repository with the container image deployed on GitHub Container Registry
 LABEL org.opencontainers.image.source="https://github.com/jckleiner/notion-backup"
 
-WORKDIR /
+WORKDIR /build
+
+# Build app
+COPY . /build
+RUN mvn clean install
 
 RUN mkdir /downloads
 RUN chmod 755 /downloads
 
-ADD ${PATH_TO_JAR} /notion-backup.jar
+WORKDIR /app
+RUN cp /build/target/notion-backup-1.0-SNAPSHOT.jar notion-backup.jar
 
 ENTRYPOINT ["java", "-jar", "notion-backup.jar"]
 
@@ -17,8 +21,8 @@ ENTRYPOINT ["java", "-jar", "notion-backup.jar"]
 ### Build/Run
 
 # Build for a specific platform:
-#   mvn clean install && docker build --platform linux/amd64 --build-arg PATH_TO_JAR=./target/notion-backup-1.0-SNAPSHOT.jar -t jckleiner/notion-backup .
-#   mvn clean install && docker build --platform linux/x86_64 --build-arg PATH_TO_JAR=./target/notion-backup-1.0-SNAPSHOT.jar -t jckleiner/notion-backup .
+#   docker build --platform linux/amd64 --build-arg -t jckleiner/notion-backup .
+#   docker build --platform linux/x86_64 --build-arg -t jckleiner/notion-backup .
 
 # Push to DockerHub:
 #   docker login
