@@ -1,4 +1,4 @@
-### Find Your notion-space-id and token_v2
+### Find Your notion-space-id, token_v2 and file_token
 
 1. Login to your [notion profile](https://www.notion.so/login)
 2. Open your developer console of your browser and go to the "Network" tab
@@ -12,6 +12,10 @@
    for `NOTION_TOKEN_V2`. This token (expires after one year and) is valid as long as you don't log out over the 
    web-UI. Meaning that you can use it in this tool as long as you don't log out. If you do log out (or if the token 
    expires after one year) then you need to log in again and fetch a new `token_v2` value.
+
+6. Visit [https://www.notion.so/f](https://www.notion.so/f) and in the **network tab** find the request named "f". Open that
+   request and go to **cookies tab** of that same requests and find the `file_token` cookie. Paste it in your `.env` file as the value for `NOTION_FILE_TOKEN`. This token (expires after one year and) is valid as long as you don't log out over the web-UI. Meaning that you can use it in this tool as long as you don't log out. If you do log out (or if the token 
+   expires after one year) then you need to log in again and fetch a new `file_token` value. (Firefox displays this cookie under "Storage" tab on any notion page, however chrome seems to filter cookies based on the page's path hence we visit "/f")
 
 ### Dropbox
 
